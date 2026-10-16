@@ -253,6 +253,77 @@ table.orders td.why { white-space: normal; min-width: 240px; color: var(--muted)
 .empty { color: var(--muted); font: 13px/1.6 var(--mono); padding: 14px 16px; border: 1px dashed var(--line-2); }
 .empty::before { content: "> "; color: var(--lime); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---- v9: hero, committee ring, timeline, results placeholder ---- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 32px; align-items: center; padding: 8px 0 44px; border-bottom: 1px solid var(--line); }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .ring { max-width: 400px; margin: 0 auto; width: 100%; } }
+.eyebrow { font: 500 12px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .14em; color: var(--muted); margin-bottom: 16px; }
+.prompt { color: var(--lime); margin-right: 4px; }
+.hero-title { font: 600 clamp(2rem, 1.1rem + 3.6vw, 3.6rem)/1.02 var(--mono); letter-spacing: -.045em; text-transform: uppercase; margin-bottom: 18px; }
+.lime { color: var(--lime); }
+.hero-sub { color: var(--muted); font-size: 16px; line-height: 1.6; max-width: 56ch; margin-bottom: 24px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+.hero-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line-2); margin: 0; background: rgba(8,11,16,.72); }
+.hero-stats div { padding: 12px 14px; border-right: 1px solid var(--line-2); min-width: 0; }
+.hero-stats div:last-child { border-right: 0; }
+.hero-stats dt { font: 500 10.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--dim); }
+.hero-stats dd { margin: 4px 0 0; font: 600 18px/1.15 var(--mono); }
+@media (max-width: 520px) { .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hero-stats div:nth-child(2) { border-right: 0; } .hero-stats div:nth-child(n+3) { border-top: 1px solid var(--line-2); } }
+.ring { margin: 0; position: relative; }
+.ring svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ring figcaption { text-align: center; font: 500 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--dim); margin-top: 6px; }
+.r-orbit { fill: none; stroke: var(--line-2); stroke-dasharray: 2 6; }
+.r-tick { stroke: var(--line-2); }
+.r-tick.major { stroke: var(--control); }
+.r-spoke { stroke: var(--line-2); stroke-width: 1; }
+.r-spoke.thinking { stroke: var(--cyan); stroke-dasharray: 4 4; animation: flow 1s linear infinite; }
+.r-spoke.done { stroke: rgba(163,230,53,.55); }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+.r-node rect { fill: var(--bg-2); stroke: var(--control); }
+.r-node text { fill: var(--muted); font: 600 12px var(--mono); }
+.r-node.thinking rect { stroke: var(--cyan); fill: rgba(34,211,238,.10); }
+.r-node.thinking text { fill: var(--cyan); }
+.r-node.done rect { stroke: var(--lime); fill: rgba(163,230,53,.10); }
+.r-node.done text { fill: var(--lime); }
+.r-node.failed rect { stroke: var(--rose); }
+.r-label { fill: var(--dim); font: 500 9.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.r-cio rect { fill: var(--bg-3); stroke: var(--cyan); }
+.r-cio text { fill: var(--fg); font: 700 14px var(--mono); letter-spacing: .06em; }
+.r-cio .sub { fill: var(--dim); font: 500 8.5px var(--mono); letter-spacing: .1em; }
+.r-cio.run rect { animation: glow 1.4s ease-in-out infinite; }
+.r-cio.done rect { stroke: var(--lime); fill: rgba(163,230,53,.12); }
+@keyframes glow { 50% { fill: rgba(34,211,238,.2); } }
+
+.how { padding: 44px 0 4px; }
+ol.rail { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+ol.rail li { position: relative; padding-right: 22px; min-width: 0; }
+ol.rail li::before { content: ""; position: absolute; top: 18px; left: 36px; right: 0; height: 1px; background: linear-gradient(90deg, var(--cyan), var(--line-2)); }
+ol.rail li:last-child::before { display: none; }
+.node { position: relative; z-index: 1; display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--cyan); color: var(--cyan);
+  background: var(--bg); font: 700 12px/1 var(--mono); box-shadow: inset 0 0 12px var(--cyan-16), 0 0 14px rgba(34,211,238,.18); }
+ol.rail h3 { font: 600 15px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 6px; }
+ol.rail p { color: var(--muted); font-size: 14px; max-width: 32ch; }
+@media (max-width: 760px) {
+  ol.rail { grid-template-columns: 1fr; gap: 22px; }
+  ol.rail li { padding: 0 0 0 54px; }
+  ol.rail li::before { top: 36px; left: 17px; right: auto; bottom: -22px; width: 1px; height: auto; background: var(--line-2); }
+  .node { position: absolute; left: 0; top: 0; }
+  ol.rail h3 { margin-top: 8px; }
+}
+ul.facts-line { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+ul.facts-line li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid var(--line-2); font: 500 11px/1.3 var(--mono);
+  text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+ul.facts-line li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+details.fmt summary { font-size: 12px; }
+details.fmt dl { margin-top: 10px; }
+.empty-results { border: 1px dashed var(--line-2); padding: 22px; display: grid; gap: 14px; }
+.empty-results p { color: var(--muted); font: 14px/1.6 var(--mono); }
+.empty-results p::before { content: "> "; color: var(--lime); }
+.preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.preview div { border: 1px solid var(--line-2); padding: 12px 14px; min-width: 0; }
+.preview b { display: block; font: 600 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--fg); margin-bottom: 4px; }
+.preview span { color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) { .preview { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -279,27 +350,49 @@ table.orders td.why { white-space: normal; min-width: 240px; color: var(--muted)
 </nav>
 
 <div class="wrap">
-  <section id="how" aria-labelledby="howTitle">
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="prompt">&gt;</span>AI investment committee</p>
+      <h2 class="hero-title" id="heroTitle">Eight analysts.<br>One CIO.<br><span class="lime">Your portfolio.</span></h2>
+      <p class="hero-sub">Load what you own. Eight Claude analysts, each with one lens, propose trades and rate each other's ideas. A CIO rules, and every order comes with a new weight, a limit price and an expiry.</p>
+      <div class="hero-cta">
+        <a class="btn primary big" href="#s1">Load your holdings</a>
+        <a class="btn big" href="#how">How it works</a>
+      </div>
+      <dl class="hero-stats">
+        <div><dt>Committee</dt><dd>8 + CIO</dd></div>
+        <div><dt>Claude calls</dt><dd>17</dd></div>
+        <div><dt>One sitting</dt><dd>3–6 min</dd></div>
+        <div><dt>Runs on</dt><dd>your plan</dd></div>
+      </dl>
+    </div>
+    <figure class="ring" aria-label="The committee: eight members around the CIO">
+      <svg id="ringSvg" viewBox="0 0 420 420" role="img"></svg>
+      <figcaption id="ringCaption">Committee idle · 8 members + CIO</figcaption>
+    </figure>
+  </section>
+
+  <section class="how" id="how" aria-labelledby="howTitle">
     <div class="section-head"><span class="marker">0</span><h2 id="howTitle">How it works</h2></div>
-    <div class="kpis">
-      <div class="kpi"><div class="k">1 · Holdings</div><p>Upload a CSV of ISINs and weights, or choose each holding from the list. Set your risk, horizon and the most you'll hold in one company.</p></div>
-      <div class="kpi"><div class="k">2 · Proposals</div><p>Eight members, each with one lens (data, news, US tech, income, growth, research, goals, tax and cost), propose their best buy and their weakest holding to sell.</p></div>
-      <div class="kpi"><div class="k">3 · Peer ratings</div><p>Each member scores the ideas they didn't propose from −5 to +5. Ideas are ranked by the average score; a wide spread marks a contested idea.</p></div>
-      <div class="kpi"><div class="k">4 · CIO ruling</div><p>The CIO approves up to three trades. House rules check the weights add up, the minimum trade and your cap on one company. Each order gets a new weight, a limit and an expiry.</p></div>
-    </div>
-    <div class="kpis facts">
-      <div class="kpi"><b>Your account</b><p>17 calls to Claude per sitting, about 3 to 6 minutes.</p></div>
-      <div class="kpi"><b>Weights first</b><p>Trades are in points of the portfolio. Add its value to see euro amounts and shares.</p></div>
-      <div class="kpi"><b>Limits</b><p>Set 0.8 of the line's usual daily move from the last price, good for 5 trading days.</p></div>
-      <div class="kpi"><b>Private</b><p>Holdings and the last sitting stay in this browser. You place any order yourself.</p></div>
-    </div>
+    <ol class="rail">
+      <li><span class="node">01</span><h3>Load</h3><p>Upload ISINs and weights, or pick holdings from a list. Set your risk, horizon and a cap on any one company.</p></li>
+      <li><span class="node">02</span><h3>Propose</h3><p>Eight members (data, news, US tech, income, growth, research, goals, tax) each propose a buy and a sell.</p></li>
+      <li><span class="node">03</span><h3>Rate</h3><p>Each scores the others' ideas from −5 to +5. A wide spread marks a contested idea.</p></li>
+      <li><span class="node">04</span><h3>Rule</h3><p>The CIO approves up to three. House rules check the money adds up, then each order gets a limit and an expiry.</p></li>
+    </ol>
+    <ul class="facts-line">
+      <li>Runs on your own Claude plan</li>
+      <li>Holdings stay in your browser</li>
+      <li>Limits from each line's daily move</li>
+      <li>You place any order yourself</li>
+    </ul>
   </section>
 
   <div class="stations">
     <!-- 1 -->
     <section class="station" id="s1">
       <div class="sthead"><span class="marker">1</span><h2>Load your holdings</h2><span class="chip" id="exampleChip">Example data</span></div>
-      <p class="stdesc">Upload them in the format below or choose them one by one. Check the table before the committee sits: it only knows what is in it.</p>
+      <p class="stdesc">Upload a CSV or pick holdings from the list. The committee only knows what is in the table below.</p>
 
       <div id="claudeBanner" class="banner" hidden></div>
 
@@ -319,12 +412,12 @@ IE00BK5BQT80,40,138.50
 IE00B5BMR087,20
 US67066G1040,8
 CASH,8</pre>
-              <dl class="cols">
+              <details class="fmt"><summary>What each column means</summary><dl class="cols">
                 <dt>isin</dt><dd>The 12-character ISIN on your broker's page or the factsheet, e.g. <span class="mono">IE00BK5BQT80</span>.</dd>
                 <dt>weight</dt><dd>% of the portfolio: 40 means 40%. A % sign is fine.</dd>
                 <dt>price</dt><dd>Optional. Latest price per share in euro, for an exact limit price.</dd>
                 <dt>CASH</dt><dd>The weight of cash you have to invest.</dd>
-              </dl>
+              </dl></details>
             </div>
             <div class="row">
               <label class="btn primary filebtn" id="fileLbl">Upload CSV<input type="file" id="file" accept=".csv,.txt,.tsv,image/png,image/jpeg,image/webp"></label>
@@ -394,24 +487,36 @@ CASH,8</pre>
       </div>
     </section>
 
+    <section class="station" id="resultsEmpty">
+      <div class="sthead"><span class="marker">2</span><h2>The sitting</h2><span class="chip">Waiting</span></div>
+      <div class="empty-results">
+        <p>Convene the committee and the sitting appears here, live, step by step.</p>
+        <div class="preview">
+          <div><b>Proposals</b><span>Each member's best buy and weakest holding, with the numbers behind it.</span></div>
+          <div><b>Ratings</b><span>A grid of every member's score on every idea, and where they disagree most.</span></div>
+          <div><b>CIO ruling</b><span>The approved orders: new weight, shares, limit price and expiry.</span></div>
+        </div>
+      </div>
+    </section>
+
     <!-- 2 -->
     <section class="station" id="s2">
       <div class="sthead"><span class="marker">2</span><h2>The committee proposes</h2><span class="chip" id="c2">Waiting</span></div>
-      <p class="stdesc">Each member argues from one lens only and proposes at most two ideas: their best buy and the weakest holding to sell, each sized in points of the portfolio.</p>
+      <p class="stdesc">Each member argues from one lens and proposes up to two ideas, sized in points of the portfolio.</p>
       <div class="members" id="members"></div>
     </section>
 
     <!-- 3 -->
     <section class="station" id="s3">
       <div class="sthead"><span class="marker">3</span><h2>Members rate each other</h2><span class="chip" id="c3">Waiting</span></div>
-      <p class="stdesc">Every member scores the ideas they did not propose, from −5 (would damage the portfolio by their lens) to +5 (exactly what their lens wants). The spread is how much they disagree.</p>
+      <p class="stdesc">Every member scores the ideas they did not propose, from −5 to +5. Spread shows how much they disagree.</p>
       <div id="ratings"></div>
     </section>
 
     <!-- 4 -->
     <section class="station" id="s4">
       <div class="sthead"><span class="marker">4</span><h2>The CIO rules</h2><span class="chip" id="c4">Waiting</span></div>
-      <p class="stdesc">The CIO approves at most three ideas. Then the house rules run: buys must be paid from cash or sales, no trade under the minimum, no company over your cap, no selling more than you hold. Each order gets a limit set from the line's usual daily move.</p>
+      <p class="stdesc">The CIO approves up to three ideas, then the house rules check them. Each order gets a limit from the line's usual daily move.</p>
       <div id="ruling"></div>
     </section>
   </div>
@@ -1033,6 +1138,10 @@ function setConvene() {
 
 function render() {
   setConvene();
+  renderRing();
+  const shown = !!sitting;
+  $("resultsEmpty").hidden = shown;
+  for (const id of ["s2", "s3", "s4"]) $(id).hidden = !shown;
   const s = sitting, ph = s ? s.phase : null;
   setStation("s1", s ? "done" : null); setMap(1, s ? "done" : null);
   const proposed = s ? MEMBERS.filter(m => s.status[m.id] === "done").length : 0;
@@ -1187,6 +1296,52 @@ function renderRuling() {
   box.append(ruling);
 }
 
+
+/* ---------- the committee ring (hero) ---------- */
+const RING_LABEL = { quant: "Quant", reader: "Reader", techbull: "Tech bull", income: "Income", moonshot: "Moonshot", researcher: "Research", goalkeeper: "Goals", taxcost: "Tax & cost" };
+function buildRing() {
+  const svg = $("ringSvg");
+  if (!svg || svg.childNodes.length) return;
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text) e.textContent = text; return e; };
+  const c = 210, R = 112;
+  svg.append(mk("circle", { cx: c, cy: c, r: R, class: "r-orbit" }));
+  for (let i = 0; i < 96; i++) {
+    const a = i / 96 * 2 * Math.PI, major = i % 12 === 0, r1 = 182, r2 = major ? 194 : 188;
+    svg.append(mk("line", { x1: c + r1 * Math.cos(a), y1: c + r1 * Math.sin(a), x2: c + r2 * Math.cos(a), y2: c + r2 * Math.sin(a), class: "r-tick" + (major ? " major" : "") }));
+  }
+  MEMBERS.forEach((m, i) => {
+    const a = -Math.PI / 2 + i / MEMBERS.length * 2 * Math.PI, x = c + R * Math.cos(a), y = c + R * Math.sin(a);
+    svg.append(mk("line", { x1: c, y1: c, x2: x, y2: y, class: "r-spoke", id: "sp-" + m.id }));
+    const g = mk("g", { class: "r-node", id: "rn-" + m.id });
+    g.append(mk("title", {}, `${m.name}: ${m.lens}`), mk("rect", { x: x - 20, y: y - 20, width: 40, height: 40 }), mk("text", { x, y: y + 4, "text-anchor": "middle" }, m.mark));
+    const cos = Math.cos(a), lx = c + 150 * cos, ly = c + 150 * Math.sin(a) + 3;
+    svg.append(g, mk("text", { x: lx, y: ly, class: "r-label", "text-anchor": Math.abs(cos) < .3 ? "middle" : cos > 0 ? "start" : "end" }, RING_LABEL[m.id] || m.mark));
+  });
+  const cio = mk("g", { class: "r-cio", id: "rn-cio" });
+  cio.append(mk("rect", { x: c - 36, y: c - 36, width: 72, height: 72 }), mk("text", { x: c, y: c + 2, "text-anchor": "middle" }, "CIO"),
+    mk("text", { x: c, y: c + 18, "text-anchor": "middle", class: "sub" }, "RULES"));
+  svg.append(cio);
+}
+function renderRing() {
+  const s = sitting;
+  MEMBERS.forEach(m => {
+    let st = "idle";
+    if (s) {
+      const v = s.phase === "rate" ? (s.rstatus || {})[m.id] : (s.status || {})[m.id];
+      st = v === "thinking" ? "thinking" : v === "done" ? "done" : v === "failed" ? "failed" : "idle";
+    }
+    const g = $("rn-" + m.id), sp = $("sp-" + m.id);
+    if (g) g.setAttribute("class", "r-node " + st);
+    if (sp) sp.setAttribute("class", "r-spoke " + st);
+  });
+  const cio = $("rn-cio");
+  if (cio) cio.setAttribute("class", "r-cio " + (!s ? "" : s.phase === "cio" ? "run" : s.phase === "done" ? "done" : ""));
+  const cap = $("ringCaption");
+  if (cap) cap.textContent = !s ? "Committee idle · 8 members + CIO"
+    : { propose: "Proposals in progress", rate: "Peer ratings in progress", cio: "The CIO is ruling", done: "Sitting complete · see the orders below", stopped: "Sitting stopped" }[s.phase] || "";
+}
+
 /* ---------- timer ---------- */
 function startTimer() {
   const t0 = Date.now(); stopTimer();
@@ -1239,7 +1394,7 @@ $("paste").addEventListener("input", () => { try { localStorage.setItem(KEY + ":
 
 load();
 try { $("paste").value = localStorage.getItem(KEY + ":paste") || ""; if (localStorage.getItem(KEY + ":tab") === "pick") showTab("pick"); } catch {}
-bindSituation(); renderExampleChip(); renderHoldings(); render();
+buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render();
 
 (async () => {
   const banner = $("claudeBanner");
