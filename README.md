@@ -1,13 +1,13 @@
-# Committee Room
+# Claude Committee Advisor
 
 A one-page investment committee. Load your holdings by ISIN and weight; eight
 AI members, each with one lens, propose trades and rate each other's ideas; a
 CIO rules, and every approved trade comes with a new weight, a limit price and
 an expiry.
 
-- **Use it:** [Committee Room in Claude](https://claude.ai/artifact/HeaRFwvkHcCSH5mLh4kj5r).
+- **Use it:** [Claude Committee Advisor in Claude](https://claude.ai/artifact/HeaRFwvkHcCSH5mLh4kj5r).
   It runs on your own Claude account, so you need to be signed in to Claude.
-- **This site:** [catalinbondari.github.io/committee-room](https://catalinbondari.github.io/committee-room/)
+- **This site:** [catalinbondari.github.io/claude-committee-advisor](https://catalinbondari.github.io/claude-committee-advisor/)
   shows the same page. You can load and check holdings here, but the committee
   itself sits inside Claude: the button takes you there.
 
@@ -55,3 +55,5 @@ first.
 
 Edit `src/page.html` (it is published to Claude as it is), then run
 `python3 build.py` to rebuild `index.html` for this site.
+
+An independent tool that runs on Claude; not made or endorsed by Anthropic.

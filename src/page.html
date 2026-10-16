@@ -1,4 +1,4 @@
-<title>Committee Room</title>
+<title>Claude Committee Advisor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
@@ -197,7 +197,7 @@ table.orders td.why { white-space: normal; font-family: var(--prose); font-size:
 <div class="wrap">
   <header class="top">
     <span class="eyebrow">Investment committee · one sitting</span>
-    <h1>Committee Room</h1>
+    <h1>Claude Committee Advisor</h1>
     <p class="lede">Load your holdings by ISIN and weight. Eight members with different lenses each propose a trade, then rate each other's ideas. The CIO rules, and every approved trade comes with a new weight, a limit price and an expiry.</p>
   </header>
 
@@ -348,7 +348,7 @@ CASH,8</pre>
     </section>
   </div>
 
-  <p class="fine" style="margin-top:26px">The committee recommends; you decide. This is not regulated financial advice. Claude cannot browse, so a name or price it fills in comes from memory and is marked; check the ISIN and the live price before you place an order. Your holdings and the last sitting are kept in this browser only.</p>
+  <p class="fine" style="margin-top:26px">The committee recommends; you decide. This is not regulated financial advice. Claude cannot browse, so a name or price it fills in comes from memory and is marked; check the ISIN and the live price before you place an order. Your holdings and the last sitting are kept in this browser only. An independent tool that runs on Claude; not made or endorsed by Anthropic.</p>
 </div>
 
 <script>
@@ -1183,7 +1183,7 @@ bindSituation(); renderExampleChip(); renderHoldings(); render();
     } else {
       // Off claude.ai (e.g. the GitHub site): the committee sits in the Claude version of this page.
       banner.replaceChildren("The committee sits inside Claude and runs on your own Claude account. ",
-        h("a", { href: $("openClaude").href, target: "_blank", rel: "noopener" }, "Open Committee Room in Claude"),
+        h("a", { href: $("openClaude").href, target: "_blank", rel: "noopener" }, "Open the Claude version"),
         ", sign in, and load your holdings there. A table filled in here doesn't carry over.");
       $("conveneBtn").hidden = true;
       $("openClaude").hidden = false;
