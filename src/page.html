@@ -317,7 +317,7 @@ CASH,8</pre>
 
       <div class="convene">
         <button class="btn primary big" id="conveneBtn" disabled>Convene the committee</button>
-        <a class="btn primary big" id="openClaude" href="https://claude.ai/artifact/HeaRFwvkHcCSH5mLh4kj5r" target="_blank" rel="noopener" hidden>Open in Claude to convene</a>
+        <a class="btn primary big" id="openClaude" href="https://claude.ai/artifact/HeaRFwvkHcCSH5mLh4kj5r" target="_blank" rel="noopener" hidden>Run it with my Claude subscription</a>
         <button class="btn" id="stopBtn" hidden>Stop the sitting</button>
         <span class="timer" id="timer" aria-live="polite"></span>
       </div>
@@ -1182,9 +1182,9 @@ bindSituation(); renderExampleChip(); renderHoldings(); render();
       banner.textContent = "Sign in to Claude to convene the committee: it runs on your own Claude account. You can still load and check your holdings.";
     } else {
       // Off claude.ai (e.g. the GitHub site): the committee sits in the Claude version of this page.
-      banner.replaceChildren("The committee sits inside Claude and runs on your own Claude account. ",
-        h("a", { href: $("openClaude").href, target: "_blank", rel: "noopener" }, "Open the Claude version"),
-        ", sign in, and load your holdings there. A table filled in here doesn't carry over.");
+      banner.replaceChildren("The committee runs on your own Claude subscription, inside Claude. ",
+        h("a", { href: $("openClaude").href, target: "_blank", rel: "noopener" }, "Open it in Claude"),
+        ", sign in if asked, and load your holdings there. A table filled in here does not carry over.");
       $("conveneBtn").hidden = true;
       $("openClaude").hidden = false;
     }
