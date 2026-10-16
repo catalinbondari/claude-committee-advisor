@@ -1,0 +1,1218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Load your holdings by ISIN and weight. Eight AI committee members propose and rate trades, and the CIO rules with new weights, limit prices and expiry.">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px/1.4 system-ui, -apple-system, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Committee Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: one vertical process rail. A compact map of the four stations heads the page;
+   each station is a section hung off the same line, filled in as the committee sits. */
+:root {
+  --paper: #ECEFEA; --sheet: #F8F9F6; --ink: #16202A; --muted: #5A6570; --rule: #C9D0C8;
+  --accent: #2343A6; --accent-ink: #FFFFFF; --buy: #16704A; --sell: #B0302A; --warn: #9A6400;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --prose: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F1418; --sheet: #161D23; --ink: #E4E8EC; --muted: #93A0AC; --rule: #2A343D;
+    --accent: #8AA3FF; --accent-ink: #0F1418; --buy: #4CC08A; --sell: #F27B71; --warn: #E1AA3E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F1418; --sheet: #161D23; --ink: #E4E8EC; --muted: #93A0AC; --rule: #2A343D;
+  --accent: #8AA3FF; --accent-ink: #0F1418; --buy: #4CC08A; --sell: #F27B71; --warn: #E1AA3E;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--display); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.num, td.n, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Masthead */
+header.top { display: grid; gap: 6px; padding-bottom: 22px; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-size: clamp(30px, 6vw, 46px); font-weight: 800; font-stretch: 118%; letter-spacing: -.01em; line-height: 1.05; }
+.lede { font-family: var(--prose); font-size: 17px; color: var(--muted); max-width: 62ch; }
+
+/* The map */
+ol.map { list-style: none; margin: 0 0 8px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+ol.map li { position: relative; display: grid; gap: 2px; justify-items: start; padding-top: 30px; padding-right: 8px; }
+ol.map li::before { content: ""; position: absolute; top: 11px; left: 0; right: 0; height: 2px; background: var(--rule); }
+ol.map li:last-child::before { right: auto; width: 24px; }
+ol.map li.done::before { background: var(--buy); }
+ol.map li.run::before { background: linear-gradient(90deg, var(--accent) 50%, var(--rule) 50%); }
+ol.map a { color: inherit; text-decoration: none; display: grid; gap: 2px; }
+.dot { position: absolute; top: 0; left: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sheet); border: 2px solid var(--rule); font: 600 12px/1 var(--mono); }
+li.run .dot { border-color: var(--accent); color: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+li.done .dot { background: var(--buy); border-color: var(--buy); color: var(--sheet); }
+li.fail .dot { border-color: var(--sell); color: var(--sell); }
+.mapname { font-weight: 700; font-size: 14px; font-stretch: 110%; }
+.mapstate { font-size: 12px; color: var(--muted); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 22%, transparent); } }
+
+/* How it works */
+.how { padding: 18px 0 24px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.howtitle { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.howgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.howgrid b { font-size: 13.5px; font-stretch: 108%; }
+.howgrid p { font-family: var(--prose); font-size: 14.5px; margin-top: 4px; }
+ul.facts { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px dashed var(--rule); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; font-size: 13px; color: var(--muted); }
+ul.facts b { color: var(--ink); }
+@media (max-width: 760px) { .howgrid, ul.facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .howgrid, ul.facts { grid-template-columns: 1fr; } }
+
+/* Stations */
+section.station { position: relative; padding: 28px 0 28px 46px; border-bottom: 1px solid var(--rule); }
+section.station::before { content: ""; position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
+section.station:first-child::before { top: 30px; }
+section.station:last-child::before { bottom: auto; height: 30px; }
+.marker { position: absolute; left: 0; top: 26px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--paper); border: 2px solid var(--ink); font: 600 13px/1 var(--mono); }
+.station.done .marker { background: var(--buy); border-color: var(--buy); color: var(--sheet); }
+.station.run .marker { border-color: var(--accent); color: var(--accent); }
+.station.fail .marker { border-color: var(--sell); color: var(--sell); }
+.sthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
+h2 { font-size: 22px; font-weight: 750; font-stretch: 112%; }
+.stdesc { color: var(--muted); max-width: 70ch; margin-bottom: 18px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+.chip.run { border-color: var(--accent); color: var(--accent); }
+.chip.done { border-color: var(--buy); color: var(--buy); }
+.chip.fail { border-color: var(--sell); color: var(--sell); }
+.chip.warn { border-color: var(--warn); color: var(--warn); }
+
+/* Station 1: holdings */
+.loadgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 760px) { .loadgrid { grid-template-columns: 1fr; } }
+.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.card h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+textarea, input[type=text], input[type=number], input[type=search], select { width: 100%; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 10px; font-size: 16px; }
+textarea { min-height: 120px; resize: vertical; font-family: var(--mono); font-size: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--ink); background: transparent; border-radius: 4px; padding: 8px 14px; font-weight: 650; cursor: pointer; }
+.btn:hover:not(:disabled) { background: color-mix(in oklab, var(--ink) 8%, transparent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { background: color-mix(in oklab, var(--accent) 86%, var(--ink)); }
+.btn.quiet { border-color: var(--rule); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.big { font-size: 17px; padding: 12px 20px; font-stretch: 110%; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.hint { font-size: 13px; color: var(--muted); }
+.hint.flag, .flag { color: var(--warn); }
+.fields { display: grid; gap: 10px; }
+.fields label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.tabs { display: inline-flex; border: 1px solid var(--rule); border-radius: 5px; padding: 2px; gap: 2px; justify-self: start; }
+.tabs button { border: 0; background: none; padding: 6px 12px; border-radius: 3px; font-weight: 650; font-size: 14px; cursor: pointer; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--sheet); }
+.panel { display: grid; gap: 12px; }
+.format pre { margin: 0; padding: 10px 12px; background: var(--paper); border: 1px dashed var(--rule); border-radius: 4px; font: 13px/1.6 var(--mono); overflow-x: auto; }
+dl.cols { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: 13px; }
+dl.cols dt { font-family: var(--mono); font-weight: 500; }
+dl.cols dd { margin: 0; color: var(--muted); }
+.pick { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: end; }
+.pick label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; }
+@media (max-width: 460px) { .pick { grid-template-columns: minmax(0, 1fr) 90px; } .pick .btn { grid-column: 1 / -1; justify-content: center; } }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+td { padding: 6px 8px; border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent); vertical-align: top; }
+th.n, td.n { text-align: right; }
+table.hold input, table.hold select { padding: 6px 8px; min-width: 0; }
+table.hold td { padding: 4px; vertical-align: middle; }
+table.hold .i { width: 150px; } table.hold .nm { min-width: 190px; } table.hold .ty { width: 92px; } table.hold .w { width: 86px; } table.hold .p { width: 100px; }
+table.hold input.isin { font-family: var(--mono); font-size: 14px; letter-spacing: .02em; }
+table.hold input.bad { border-color: var(--sell); }
+table.hold .src { display: block; font-size: 11.5px; color: var(--muted); padding: 2px 2px 0; }
+table.hold tfoot td { font-weight: 600; border-bottom: 0; }
+table.hold tfoot .sum td { font-weight: 700; padding-top: 10px; }
+.x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.x:hover { color: var(--sell); }
+.banner { border: 1px solid var(--warn); background: color-mix(in oklab, var(--warn) 10%, var(--sheet)); padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+.banner.bad { border-color: var(--sell); background: color-mix(in oklab, var(--sell) 9%, var(--sheet)); }
+.convene { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 20px; }
+.timer { font-family: var(--mono); color: var(--muted); }
+
+/* Station 2: members */
+.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.member { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.member .who { display: flex; align-items: center; gap: 10px; }
+.badge { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 12px/1 var(--mono); border: 1.5px solid var(--ink); }
+.member.thinking .badge { border-color: var(--accent); color: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+.member.failed { border-style: dashed; }
+.member .nm { font-weight: 700; font-stretch: 108%; line-height: 1.2; }
+.member .lens { font-size: 12.5px; color: var(--muted); }
+.mstate { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.idea { border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 4px; }
+.line { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.act { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border-radius: 3px; color: var(--sheet); }
+.act.buy { background: var(--buy); } .act.sell { background: var(--sell); }
+.tick { font-family: var(--mono); font-weight: 500; }
+.sub { font-size: 12.5px; color: var(--muted); }
+.thesis { font-family: var(--prose); font-size: 14.5px; }
+ul.ev { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--muted); }
+
+/* Station 3: matrix */
+table.matrix th.m, table.matrix td.m { text-align: center; width: 44px; padding: 6px 2px; }
+table.matrix td.m { font-family: var(--mono); font-size: 13px; }
+table.matrix td.m span { display: inline-grid; place-items: center; width: 34px; height: 26px; border-radius: 3px; }
+table.matrix .own { color: var(--muted); font-size: 12px; }
+.idcell { white-space: nowrap; }
+details { margin-top: 4px; }
+summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+.whys { display: grid; gap: 10px; margin-top: 10px; }
+.whys .w { font-size: 13.5px; }
+.whys .w b { font-family: var(--mono); font-weight: 500; }
+.callout { font-size: 14px; padding: 10px 0; }
+
+/* Station 4: ruling */
+.ruling { display: grid; gap: 18px; }
+.verdict { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; background: var(--sheet); border: 1px solid var(--ink); border-radius: 6px; padding: 18px; }
+@media (max-width: 560px) { .verdict { grid-template-columns: 1fr; } }
+.stamp { font: 800 15px/1 var(--display); font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; padding: 10px 12px; border: 2.5px solid currentColor; border-radius: 4px; transform: rotate(-3deg); justify-self: start; }
+.stamp.approve { color: var(--buy); } .stamp.amend { color: var(--warn); } .stamp.reject { color: var(--sell); }
+.note { font-family: var(--prose); font-size: 18px; line-height: 1.5; max-width: 64ch; }
+.note small { display: block; font-family: var(--display); font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: .04em; text-transform: uppercase; }
+table.orders td { white-space: nowrap; }
+table.orders td.why { white-space: normal; font-family: var(--prose); font-size: 14px; min-width: 240px; }
+.flagline { display: block; font-size: 12.5px; color: var(--warn); margin-top: 3px; font-family: var(--display); }
+.up { color: var(--buy); } .down { color: var(--sell); }
+.stopped { display: grid; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.stopped li { font-size: 14px; }
+.stopped .tick { margin-right: 6px; }
+.fine { font-size: 12.5px; color: var(--muted); max-width: 80ch; }
+.empty { color: var(--muted); font-family: var(--prose); font-size: 15px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+@media (max-width: 520px) { section.station { padding-left: 40px; } .mapname { font-size: 12.5px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Investment committee · one sitting</span>
+    <h1>Committee Room</h1>
+    <p class="lede">Load your holdings by ISIN and weight. Eight members with different lenses each propose a trade, then rate each other's ideas. The CIO rules, and every approved trade comes with a new weight, a limit price and an expiry.</p>
+  </header>
+
+  <ol class="map" id="map" aria-label="The four stations">
+    <li data-s="1"><span class="dot">1</span><a href="#s1"><span class="mapname">Holdings</span><span class="mapstate" id="m1">Example loaded</span></a></li>
+    <li data-s="2"><span class="dot">2</span><a href="#s2"><span class="mapname">Proposals</span><span class="mapstate" id="m2">8 members</span></a></li>
+    <li data-s="3"><span class="dot">3</span><a href="#s3"><span class="mapname">Peer ratings</span><span class="mapstate" id="m3">−5 to +5</span></a></li>
+    <li data-s="4"><span class="dot">4</span><a href="#s4"><span class="mapname">CIO ruling</span><span class="mapstate" id="m4">Orders with limits</span></a></li>
+  </ol>
+
+  <section class="how" id="how" aria-labelledby="howTitle">
+    <h2 id="howTitle" class="howtitle">How it works</h2>
+    <div class="howgrid">
+      <div><b>1 · Holdings</b><p>Upload a CSV of ISINs and weights, or choose each holding from the list. Set your risk, horizon and the most you'll hold in one company.</p></div>
+      <div><b>2 · Proposals</b><p>Eight members, each with one lens (data, news, US tech, income, growth, research, goals, tax and cost), propose their best buy and their weakest holding to sell.</p></div>
+      <div><b>3 · Peer ratings</b><p>Each member scores the ideas they didn't propose from −5 to +5. Ideas are ranked by the average score; a wide spread marks a contested idea.</p></div>
+      <div><b>4 · CIO ruling</b><p>The CIO approves up to three trades. House rules check the weights add up, the minimum trade and your cap on one company. Each order gets a new weight, a limit and an expiry.</p></div>
+    </div>
+    <ul class="facts">
+      <li><b>Your account.</b> 17 calls to Claude per sitting, about 3 to 6 minutes.</li>
+      <li><b>Weights first.</b> Trades are in points of the portfolio. Add its value to see euro amounts and shares.</li>
+      <li><b>Limits.</b> Set 0.8 of the line's usual daily move from the last price, good for 5 trading days.</li>
+      <li><b>Private.</b> Holdings and the last sitting stay in this browser. You place any order yourself.</li>
+    </ul>
+  </section>
+
+  <div class="stations">
+    <!-- 1 -->
+    <section class="station" id="s1">
+      <span class="marker">1</span>
+      <div class="sthead"><h2>Load your holdings</h2><span class="chip" id="exampleChip">Example data</span></div>
+      <p class="stdesc">Upload them in the format below or choose them one by one. Check the table before the committee sits: it only knows what is in it.</p>
+
+      <div id="claudeBanner" class="banner" hidden></div>
+
+      <div class="loadgrid">
+        <div class="card">
+          <div class="tabs" role="tablist" aria-label="How to add holdings">
+            <button role="tab" id="tabUpload" aria-selected="true" aria-controls="pUpload">Upload</button>
+            <button role="tab" id="tabPick" aria-selected="false" aria-controls="pPick">Choose manually</button>
+          </div>
+
+          <div class="panel" id="pUpload" role="tabpanel" aria-labelledby="tabUpload">
+            <div class="format panel">
+              <p class="hint">One line per holding, comma-separated. Weights are % of the whole portfolio, and with the <span class="mono">CASH</span> line they add up to 100.</p>
+              <pre id="template">isin,weight,price
+IE00BK5BQT80,40,138.50
+IE00B5BMR087,20
+US67066G1040,8
+CASH,8</pre>
+              <dl class="cols">
+                <dt>isin</dt><dd>The 12-character ISIN on your broker's page or the factsheet, e.g. <span class="mono">IE00BK5BQT80</span>.</dd>
+                <dt>weight</dt><dd>% of the portfolio: 40 means 40%. A % sign is fine.</dd>
+                <dt>price</dt><dd>Optional. Latest price per share in euro, for an exact limit price.</dd>
+                <dt>CASH</dt><dd>The weight of cash you have to invest.</dd>
+              </dl>
+            </div>
+            <div class="row">
+              <label class="btn primary filebtn" id="fileLbl">Upload CSV<input type="file" id="file" accept=".csv,.txt,.tsv,image/png,image/jpeg,image/webp"></label>
+              <button class="btn quiet" id="copyTpl">Copy the template</button>
+            </div>
+            <details id="pasteBox">
+              <summary>Or paste the lines</summary>
+              <textarea id="paste" placeholder="isin,weight,price"></textarea>
+              <div class="row" style="margin-top:8px"><button class="btn" id="readBtn">Read the lines</button></div>
+            </details>
+          </div>
+
+          <div class="panel" id="pPick" role="tabpanel" aria-labelledby="tabPick" hidden>
+            <div class="pick">
+              <label>Fund or share
+                <input type="search" id="pickName" list="universe" placeholder="Name, ticker or ISIN" autocomplete="off"></label>
+              <label>Weight %
+                <input type="number" id="pickWeight" step="any" inputmode="decimal" min="0" max="100"></label>
+              <button class="btn primary" id="pickAdd">Add</button>
+            </div>
+            <datalist id="universe"></datalist>
+            <p class="hint">The list has common ETFs and large shares. Anything else: type its ISIN.</p>
+          </div>
+
+          <p class="hint" id="readState">A broker screenshot works too: upload it and Claude reads it into the table.</p>
+        </div>
+
+        <div class="card">
+          <h3>Your situation</h3>
+          <div class="fields">
+            <label>Risk
+              <select id="risk"><option value="cautious">Cautious</option><option value="balanced">Balanced</option><option value="adventurous">Adventurous</option></select></label>
+            <label>Horizon
+              <select id="horizon">
+                <option value="under 1 year">Under 1 year</option><option value="1-3 years">1–3 years</option>
+                <option value="3-10 years">3–10 years</option><option value="over 10 years">Over 10 years</option></select></label>
+            <label>Max in one company (%)
+              <input type="number" id="maxSingle" step="any" inputmode="decimal" min="1" max="100"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="row" style="justify-content:space-between">
+          <h3>Holdings</h3>
+          <div class="row"><button class="btn quiet" id="addRow">Add an empty line</button><button class="btn quiet" id="clearAll">Clear table</button></div>
+        </div>
+        <div class="tablewrap">
+          <table class="hold" id="holdTable">
+            <thead><tr><th>ISIN</th><th>Name</th><th>Type</th><th class="n">Weight %</th><th class="n">Price € <span class="sr">optional</span></th><th><span class="sr">Remove</span></th></tr></thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr><td colspan="3">Cash to invest</td><td class="w"><input type="number" id="cash" step="any" inputmode="decimal" min="0" aria-label="Cash weight %"></td><td colspan="2"></td></tr>
+              <tr class="sum"><td colspan="3">Total</td><td class="n num" id="totalCell"></td><td colspan="2" class="hint" id="sumNote"></td></tr>
+              <tr><td colspan="3">Portfolio value € <span class="hint">(optional, for euro amounts and shares)</span></td><td colspan="2"><input type="number" id="value" step="any" inputmode="decimal" min="0" aria-label="Portfolio value in euro" placeholder="e.g. 25000"></td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="hint" id="tableHint"></p>
+      </div>
+
+      <div class="convene">
+        <button class="btn primary big" id="conveneBtn" disabled>Convene the committee</button>
+        <a class="btn primary big" id="openClaude" href="https://claude.ai/artifact/HeaRFwvkHcCSH5mLh4kj5r" target="_blank" rel="noopener" hidden>Open in Claude to convene</a>
+        <button class="btn" id="stopBtn" hidden>Stop the sitting</button>
+        <span class="timer" id="timer" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="station" id="s2">
+      <span class="marker">2</span>
+      <div class="sthead"><h2>The committee proposes</h2><span class="chip" id="c2">Waiting</span></div>
+      <p class="stdesc">Each member argues from one lens only and proposes at most two ideas: their best buy and the weakest holding to sell, each sized in points of the portfolio.</p>
+      <div class="members" id="members"></div>
+    </section>
+
+    <!-- 3 -->
+    <section class="station" id="s3">
+      <span class="marker">3</span>
+      <div class="sthead"><h2>Members rate each other</h2><span class="chip" id="c3">Waiting</span></div>
+      <p class="stdesc">Every member scores the ideas they did not propose, from −5 (would damage the portfolio by their lens) to +5 (exactly what their lens wants). The spread is how much they disagree.</p>
+      <div id="ratings"></div>
+    </section>
+
+    <!-- 4 -->
+    <section class="station" id="s4">
+      <span class="marker">4</span>
+      <div class="sthead"><h2>The CIO rules</h2><span class="chip" id="c4">Waiting</span></div>
+      <p class="stdesc">The CIO approves at most three ideas. Then the house rules run: buys must be paid from cash or sales, no trade under the minimum, no company over your cap, no selling more than you hold. Each order gets a limit set from the line's usual daily move.</p>
+      <div id="ruling"></div>
+    </section>
+  </div>
+
+  <p class="fine" style="margin-top:26px">The committee recommends; you decide. This is not regulated financial advice. Claude cannot browse, so a name or price it fills in comes from memory and is marked; check the ISIN and the live price before you place an order. Your holdings and the last sitting are kept in this browser only.</p>
+</div>
+
+<script>
+"use strict";
+const KEY = "committee-room:v2";
+const MAX_APPROVED = 3;
+const LIMIT_SESSIONS = 5;
+const CONCURRENCY = 3;
+const MIN_TRADE_EUR = 150;
+const MIN_TRADE_PTS = 0.5;          // when the portfolio value isn't given
+const FATAL = new Set(["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed", "session_expired", "rate_limited"]);
+
+/* Common ETFs and large shares. Every ISIN passes its check digit. */
+const UNIVERSE = [
+  ["IE00BK5BQT80", "VWCE", "Vanguard FTSE All-World (Acc)", "fund"],
+  ["IE00B3RBWM25", "VWRL", "Vanguard FTSE All-World (Dist)", "fund"],
+  ["IE00B4L5Y983", "IWDA", "iShares Core MSCI World (Acc)", "fund"],
+  ["IE00BKX55T58", "VEVE", "Vanguard FTSE Developed World (Dist)", "fund"],
+  ["IE00B5BMR087", "CSPX", "iShares Core S&P 500 (Acc)", "fund"],
+  ["IE00BFMXXD54", "VUAA", "Vanguard S&P 500 (Acc)", "fund"],
+  ["IE00B3XXRP09", "VUSA", "Vanguard S&P 500 (Dist)", "fund"],
+  ["IE000XZSV718", "SPYL", "SPDR S&P 500 (Acc)", "fund"],
+  ["IE00B53SZB19", "CNDX", "iShares Nasdaq 100 (Acc)", "fund"],
+  ["IE00B3WJKG14", "QDVE", "iShares S&P 500 Information Technology Sector", "fund"],
+  ["IE00B4K48X80", "IMAE", "iShares Core MSCI Europe (Acc)", "fund"],
+  ["IE00BKM4GZ66", "EIMI", "iShares Core MSCI EM IMI (Acc)", "fund"],
+  ["IE00BTJRMP35", "XMME", "Xtrackers MSCI Emerging Markets (Acc)", "fund"],
+  ["IE00BF4RFH31", "IUSN", "iShares MSCI World Small Cap (Acc)", "fund"],
+  ["IE00BP3QZ601", "IWQU", "iShares Edge MSCI World Quality Factor", "fund"],
+  ["IE00BP3QZ825", "IWMO", "iShares Edge MSCI World Momentum Factor", "fund"],
+  ["IE00BP3QZB59", "IWVL", "iShares Edge MSCI World Value Factor", "fund"],
+  ["IE00B8GKDB10", "VHYL", "Vanguard FTSE All-World High Dividend Yield", "fund"],
+  ["IE00B6YX5C33", "USDV", "SPDR S&P US Dividend Aristocrats", "fund"],
+  ["IE00BM67HK77", "XDWH", "Xtrackers MSCI World Health Care", "fund"],
+  ["IE00BM67HT60", "XDWT", "Xtrackers MSCI World Information Technology", "fund"],
+  ["IE00BGV5VN51", "XAIX", "Xtrackers Artificial Intelligence & Big Data", "fund"],
+  ["IE00BYZK4552", "RBOT", "iShares Automation & Robotics", "fund"],
+  ["IE00B1XNHC34", "INRG", "iShares Global Clean Energy", "fund"],
+  ["IE00B4WXJJ64", "IEGA", "iShares Core Euro Government Bond", "fund"],
+  ["IE00B3F81R35", "IEAC", "iShares Core Euro Corporate Bond", "fund"],
+  ["LU0290358497", "XEON", "Xtrackers II EUR Overnight Rate Swap", "fund"],
+  ["IE00B4ND3602", "SGLN", "iShares Physical Gold ETC", "fund"],
+  ["IE00B579F325", "SGLD", "Invesco Physical Gold ETC", "fund"],
+  ["US0378331005", "AAPL", "Apple", "stock"],
+  ["US5949181045", "MSFT", "Microsoft", "stock"],
+  ["US67066G1040", "NVDA", "NVIDIA", "stock"],
+  ["US0231351067", "AMZN", "Amazon", "stock"],
+  ["US02079K3059", "GOOGL", "Alphabet (Class A)", "stock"],
+  ["US30303M1027", "META", "Meta Platforms", "stock"],
+  ["US88160R1014", "TSLA", "Tesla", "stock"],
+  ["US11135F1012", "AVGO", "Broadcom", "stock"],
+  ["US69608A1088", "PLTR", "Palantir", "stock"],
+  ["US0846707026", "BRK.B", "Berkshire Hathaway (Class B)", "stock"],
+  ["US46625H1005", "JPM", "JPMorgan Chase", "stock"],
+  ["US92826C8394", "V", "Visa", "stock"],
+  ["US4781601046", "JNJ", "Johnson & Johnson", "stock"],
+  ["US1912161007", "KO", "Coca-Cola", "stock"],
+  ["US7427181091", "PG", "Procter & Gamble", "stock"],
+  ["NL0010273215", "ASML", "ASML Holding", "stock"],
+  ["DE0007164600", "SAP", "SAP", "stock"],
+  ["DE0007030033", "RHM", "Rheinmetall", "stock"],
+  ["FR0000121014", "MC", "LVMH", "stock"],
+  ["DK0062498333", "NOVO B", "Novo Nordisk (B)", "stock"],
+  ["CH0038863350", "NESN", "Nestlé", "stock"],
+  ["GB0009895292", "AZN", "AstraZeneca", "stock"],
+].map(([isin, ticker, name, type]) => ({ isin, ticker, name, type }));
+const UNI = Object.fromEntries(UNIVERSE.map(u => [u.isin, u]));
+
+const MEMBERS = [
+  { id: "quant", name: "The Quant", mark: "Qu", lens: "Momentum, trend, valuation: only what can be measured",
+    brief: "You are the Quant. You trust only what can be measured and back-tested: 12-1 momentum, the 200-day trend, the gap between the growth a price implies and the growth the business can sustain, and cost. Ignore stories and headlines." },
+  { id: "reader", name: "The Reader", mark: "Re", lens: "News, analyst consensus, insider trades, sentiment",
+    brief: "You are the Reader. You work from soft data: the news on each holding, analyst consensus and price targets, insider buying and selling, and what prediction markets are pricing. Prices lag what people are saying and doing." },
+  { id: "techbull", name: "The US Tech Bull", mark: "TB", lens: "US large caps and AI, buying dips in uptrends",
+    brief: "You are the US Tech Bull. You believe US large caps and AI compound fastest and that being underweight them is the expensive mistake. You buy dips in uptrends." },
+  { id: "income", name: "The Income Keeper", mark: "In", lens: "Covered dividends, low beta, capital that holds",
+    brief: "You are the Income Keeper. You want steady cash flow and small drawdowns: covered dividend yield, low beta, cash-generative businesses, capital that does not fall. You distrust excitement and loss-makers." },
+  { id: "moonshot", name: "The Moonshot Hunter", mark: "Mo", lens: "Fast growth, momentum, convexity",
+    brief: "You are the Moonshot Hunter. You look for the next company that multiplies: fast earnings growth, strong momentum, small and fast-growing names, convexity. One ten-bagger pays for ten mistakes. Indexes bore you." },
+  { id: "researcher", name: "The Researcher", mark: "Rs", lens: "Published evidence: low fees, diversification, factors",
+    brief: "You are the Researcher. You do what the published evidence says survives costs: low fees, broad diversification, factor premia with real evidence (quality, value, momentum), avoiding dilution. You ignore stories." },
+  { id: "goalkeeper", name: "The Goal Keeper", mark: "GK", lens: "Horizon, concentration, drawdown",
+    brief: "You are the Goal Keeper. Money with a date must be there on the date. You guard the investor's horizon, concentration in single lines, beta and drawdown. Nothing that can halve belongs in money needed within three years." },
+  { id: "taxcost", name: "The Tax & Cost Officer", mark: "Tx", lens: "Tax on gains, funds vs shares, trading cost",
+    brief: "You are the Tax & Cost Officer. You count returns after tax and commission: how shares and funds are taxed differently, annual exemptions, loss relief, fund fees and trading costs. You dislike churn and realising big gains. The investor's tax country is not given: say which rules you assumed." },
+];
+const NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name]));
+
+const EXAMPLE = {
+  example: true, risk: "balanced", horizon: "3-10 years", maxSingle: 10, cash: 8, value: 25000, ids: {},
+  holdings: [
+    { isin: "IE00BK5BQT80", name: "", type: "", weight: 40, price: 138.5 },
+    { isin: "IE00B5BMR087", name: "", type: "", weight: 20, price: null },
+    { isin: "IE00BKM4GZ66", name: "", type: "", weight: 8, price: null },
+    { isin: "NL0010273215", name: "", type: "", weight: 6, price: null },
+    { isin: "US67066G1040", name: "", type: "", weight: 8, price: null },
+    { isin: "US88160R1014", name: "", type: "", weight: 4, price: null },
+    { isin: "IE00B4ND3602", name: "", type: "", weight: 6, price: null },
+  ],
+};
+
+let state = JSON.parse(JSON.stringify(EXAMPLE));
+let sitting = null;
+let sample = null, imagesOK = false, claudeReady = false;
+let running = false, halt = null;
+const live = new Set();
+let timerId = null;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "style") e.setAttribute("style", v);
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+const num = x => { if (x === "" || x == null) return null; const v = typeof x === "string" ? parseFloat(x.replace(/[^0-9.\-]/g, "")) : Number(x); return Number.isFinite(v) ? v : null; };
+const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+const round = (x, d = 0) => x == null ? null : Math.round(x * 10 ** d) / 10 ** d;
+function eur(x, dp = 0) {
+  if (x == null) return "–";
+  return new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: dp, minimumFractionDigits: dp }).format(x);
+}
+const priceDp = p => p >= 1 ? 2 : 4;
+const pct = (x, dp = 1) => x == null ? "–" : `${x.toFixed(dp)}%`;
+const pts = x => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x).toFixed(1)} pts`;
+const today = () => new Date().toISOString().slice(0, 10);
+function addSessions(n) {
+  const d = new Date(); let left = n;
+  while (left > 0) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) left--; }
+  return d.toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short" });
+}
+
+/* ISIN: two letters, nine characters, one check digit (Luhn over the letters as numbers). */
+function isinOk(isin) {
+  if (!/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/.test(isin || "")) return false;
+  const d = isin.split("").map(c => /[A-Z]/.test(c) ? String(c.charCodeAt(0) - 55) : c).join("");
+  let s = 0, dbl = false;
+  for (let i = d.length - 1; i >= 0; i--) { let x = +d[i]; if (dbl) { x *= 2; if (x > 9) x -= 9; } s += x; dbl = !dbl; }
+  return s % 10 === 0;
+}
+const findIsin = text => { const m = String(text || "").toUpperCase().match(/[A-Z]{2}[A-Z0-9]{9}[0-9]/); return m ? m[0] : null; };
+const info = isin => UNI[isin] || (state.ids && state.ids[isin]) || null;
+const nameOf = r => r.name || (info(r.isin) && info(r.isin).name) || "";
+const typeOf = r => r.type || (info(r.isin) && info(r.isin).type) || "";
+const tickerOf = isin => (info(isin) && info(isin).ticker) || "";
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ state, sitting })); } catch {} }
+function load() {
+  try {
+    const blob = JSON.parse(localStorage.getItem(KEY));
+    if (blob && blob.state) { state = { ...EXAMPLE, ...blob.state, ids: blob.state.ids || {} }; sitting = blob.sitting || null; }
+  } catch {}
+  if (sitting && sitting.phase !== "done" && sitting.phase !== "stopped") { sitting.phase = "stopped"; sitting.error = "This sitting was interrupted when the page closed."; }
+}
+
+/* ---------- holdings table ---------- */
+function sumWeights() { return state.holdings.reduce((s, r) => s + (num(r.weight) || 0), 0) + (num(state.cash) || 0); }
+function markOwned() { if (state.example) { state.example = false; renderExampleChip(); } }
+
+function renderHoldings() {
+  const tb = $("holdTable").tBodies[0];
+  tb.innerHTML = "";
+  state.holdings.forEach((r, i) => {
+    const isin = h("input", { type: "text", class: "isin" + (r.isin && !isinOk(r.isin) ? " bad" : ""), value: r.isin || "", placeholder: "ISIN", "aria-label": "ISIN", maxlength: "12", autocapitalize: "characters", spellcheck: "false" });
+    isin.addEventListener("change", () => { r.isin = isin.value.trim().toUpperCase(); markOwned(); renderHoldings(); save(); identify(); });
+    const nm = h("input", { type: "text", value: r.name || "", placeholder: nameOf({ isin: r.isin }) || "Name", "aria-label": "Name" });
+    nm.addEventListener("input", () => { r.name = nm.value; markOwned(); save(); });
+    const ty = h("select", { "aria-label": "Type" }, h("option", { value: "" }, "–"), h("option", { value: "fund" }, "Fund"), h("option", { value: "stock" }, "Share"));
+    ty.value = typeOf(r);
+    ty.addEventListener("change", () => { r.type = ty.value; markOwned(); save(); });
+    const w = h("input", { type: "number", step: "any", inputmode: "decimal", min: "0", value: r.weight ?? "", "aria-label": "Weight %" });
+    w.addEventListener("input", () => { r.weight = num(w.value); markOwned(); updateTotals(); save(); });
+    const p = h("input", { type: "number", step: "any", inputmode: "decimal", min: "0", value: r.price ?? "", placeholder: "–", "aria-label": "Price in euro (optional)" });
+    p.addEventListener("input", () => { r.price = num(p.value); markOwned(); save(); });
+    const id = info(r.isin);
+    const src = !r.name && id && !UNI[r.isin] ? h("span", { class: "src" }, "Named by Claude: check it")
+      : r.isin && isinOk(r.isin) && !id && !r.name ? h("span", { class: "src" }, "Not in the list: type the name") : null;
+    tb.append(h("tr", {},
+      h("td", { class: "i" }, isin),
+      h("td", { class: "nm" }, nm, src),
+      h("td", { class: "ty" }, ty),
+      h("td", { class: "w" }, w),
+      h("td", { class: "p" }, p),
+      h("td", {}, h("button", { class: "x", title: "Remove this line", "aria-label": "Remove " + (r.isin || "line"),
+        onclick: () => { state.holdings.splice(i, 1); markOwned(); renderHoldings(); save(); } }, "×"))));
+  });
+  updateTotals();
+}
+function updateTotals() {
+  const s = sumWeights();
+  $("totalCell").textContent = pct(s);
+  const off = s > 0 && Math.abs(s - 100) > 0.5;
+  $("totalCell").className = "n num" + (off ? " flag" : "");
+  $("sumNote").textContent = off ? "Should add up to 100. The committee will scale them to 100." : "";
+  const bad = state.holdings.filter(r => r.isin && !isinOk(r.isin)).length;
+  const missing = state.holdings.filter(r => !r.isin).length;
+  $("tableHint").className = bad || missing ? "hint flag" : "hint";
+  $("tableHint").textContent = bad ? `${bad} ISIN${bad > 1 ? "s fail" : " fails"} the check digit (red). Fix ${bad > 1 ? "them" : "it"} or the line is left out.`
+    : missing ? `${missing} line${missing > 1 ? "s have" : " has"} no ISIN and will be left out.`
+    : "Price is optional: with it, the limit price is exact rather than estimated.";
+  const n = state.holdings.filter(r => isinOk(r.isin)).length;
+  $("m1").textContent = state.example ? "Example loaded" : n ? `${n} line${n > 1 ? "s" : ""} · ${pct(s, 0)}` : "Empty";
+  setConvene();
+}
+function renderExampleChip() { $("exampleChip").hidden = !state.example; }
+
+function bindSituation() {
+  for (const id of ["cash", "value", "horizon", "risk", "maxSingle"]) {
+    const el = $(id);
+    el.value = state[id] ?? "";
+    el.addEventListener("input", () => {
+      state[id] = el.type === "number" ? num(el.value) : el.value;
+      if (id === "cash" || id === "value") markOwned();
+      updateTotals(); save();
+    });
+  }
+}
+
+/* ---------- adding holdings ---------- */
+function parseTemplate(text) {
+  const rows = [], bad = [];
+  let cash = null;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    const cells = line.split(/[,;\t]/).map(c => c.trim().replace(/^"|"$/g, ""));
+    const first = cells[0].toUpperCase().replace(/\s+/g, "");
+    if (first === "ISIN") continue;
+    if (first === "CASH") { const v = num(cells[1]); if (v != null) { cash = v; continue; } }
+    const weight = num(cells[1]);
+    if (!isinOk(first) || weight == null) { bad.push(line); continue; }
+    rows.push({ isin: first, name: "", type: "", weight, price: num(cells[2]) });
+  }
+  // Weights given as fractions (0.40) rather than percentages.
+  const total = rows.reduce((s, r) => s + r.weight, 0) + (cash || 0);
+  if (rows.length && total > 0.5 && total <= 1.01) { rows.forEach(r => { r.weight = round(r.weight * 100, 2); }); if (cash != null) cash = round(cash * 100, 2); }
+  return { rows, cash, bad };
+}
+function applyRows(rows, cash, note) {
+  state.holdings = rows;
+  if (cash != null) { state.cash = cash; $("cash").value = cash; }
+  state.example = false; renderExampleChip(); renderHoldings(); save();
+  const st = $("readState");
+  st.className = note ? "hint flag" : "hint";
+  st.textContent = `Read ${rows.length} line${rows.length > 1 ? "s" : ""}${cash != null ? " and the cash" : ""}. ` + (note || "Check the table, then convene the committee.");
+  identify();
+}
+
+const READ = `Read this investor's holdings and return them as data. Copy what is shown; never guess.
+- isin: the 12-character ISIN if it is shown, or if you are certain of it from the name and ticker; otherwise null.
+- name: as shown. weightPct: the line's % of the whole portfolio, as shown or computed from the values shown.
+- priceEur: latest price per share in euro if shown, else null. cashPct: uninvested cash as % of the portfolio if shown, else null.
+Say what was unclear in "unclear".
+Reply with only JSON: {"holdings":[{"isin":null,"name":"","weightPct":0,"priceEur":null}],"cashPct":null,"unclear":""}`;
+
+async function readHoldings(text, image) {
+  const st = $("readState");
+  if (text) {
+    const p = parseTemplate(text);
+    if (p.rows.length && !p.bad.length) return applyRows(p.rows, p.cash, "");
+    if (!sample) {
+      if (p.rows.length) applyRows(p.rows, p.cash, `Skipped ${p.bad.length} line${p.bad.length > 1 ? "s" : ""} that didn't match the format: ${p.bad.slice(0, 3).join(" | ")}`);
+      else { st.className = "hint flag"; st.textContent = "No lines match the format. Copy the template and fill it in."; }
+      return;
+    }
+  }
+  if (!sample) return;
+  $("readBtn").disabled = true;
+  st.className = "hint"; st.textContent = "Claude is reading it…";
+  try {
+    const out = await sample.json(READ + (text ? "\n\nThe holdings as pasted:\n" + text.slice(0, 20000) : "\n\nThe holdings are in the attached screenshot."),
+      image ? { images: [image] } : {});
+    const rows = (out && Array.isArray(out.holdings) ? out.holdings : []).filter(r => r && (r.isin || r.name)).map(r => {
+      const isin = findIsin(r.isin);
+      return { isin: isin && isinOk(isin) ? isin : "", name: String(r.name || "").slice(0, 80), type: "", weight: num(r.weightPct), price: num(r.priceEur) };
+    });
+    if (!rows.length) { st.className = "hint flag"; st.textContent = "No holdings found in that. Try the template format, or choose them manually."; return; }
+    const noIsin = rows.filter(r => !r.isin).length;
+    applyRows(rows, num(out.cashPct), [noIsin ? `${noIsin} line${noIsin > 1 ? "s" : ""} without an ISIN: fill ${noIsin > 1 ? "them" : "it"} in.` : "", out.unclear ? "Check: " + out.unclear : ""].filter(Boolean).join(" "));
+  } catch (e) {
+    st.className = "hint flag";
+    st.textContent = e && e.code === "not_granted" ? "You didn't allow this page to use Claude. Use the template format or choose the holdings manually."
+      : e && e.code === "rate_limited" ? "Claude's usage limit was reached. Use the template format or choose the holdings manually."
+      : e && e.code === "image_rejected" ? "That image couldn't be read. Try a PNG or JPEG screenshot."
+      : "Couldn't read that. Use the template format or choose the holdings manually.";
+  } finally { $("readBtn").disabled = false; }
+}
+
+/* Names and types for ISINs that aren't in the built-in list: one call, kept. */
+let identifying = null;
+function identify() {
+  if (!sample) return Promise.resolve();
+  if (identifying) return identifying;
+  const unknown = [...new Set(state.holdings.map(r => r.isin).filter(i => isinOk(i) && !UNI[i] && !(i in state.ids)))];
+  if (!unknown.length) return Promise.resolve();
+  identifying = (async () => {
+    try {
+      const out = await sample.json(`Identify these securities by ISIN. For each give name, type ("fund" for an ETF, fund or ETC, "stock" for a single company), ticker (its main listing), priceEur (your last-known price per share in euro, or null) and dailyMovePct (its typical daily move in %). If you don't recognise an ISIN, give null for it; never guess.
+ISINs: ${unknown.join(", ")}
+Reply with only JSON: {"<isin>": {"name":"","type":"fund","ticker":"","priceEur":null,"dailyMovePct":1.0}}`, { modelTier: "default" });
+      for (const i of unknown) {
+        const x = out && out[i];
+        state.ids[i] = x && x.name ? { name: String(x.name).slice(0, 80), type: x.type === "stock" ? "stock" : "fund", ticker: String(x.ticker || "").slice(0, 12), priceEur: num(x.priceEur), dailyMovePct: num(x.dailyMovePct), byClaude: true } : null;
+      }
+      save(); renderHoldings();
+    } catch { /* names stay blank; the table says so */ }
+    finally { identifying = null; }
+  })();
+  return identifying;
+}
+
+function addPicked() {
+  const st = $("readState");
+  const isin = findIsin($("pickName").value);
+  const w = num($("pickWeight").value);
+  if (!isin || !isinOk(isin)) { st.className = "hint flag"; st.textContent = "Pick a fund or share from the list, or type a valid 12-character ISIN."; return; }
+  if (!(w > 0)) { st.className = "hint flag"; st.textContent = "Give it a weight: the % of your portfolio it makes up."; return; }
+  if (state.example) { state.holdings = []; state.cash = null; $("cash").value = ""; state.example = false; renderExampleChip(); }
+  const have = state.holdings.find(r => r.isin === isin);
+  if (have) have.weight = round((num(have.weight) || 0) + w, 2);
+  else state.holdings.push({ isin, name: "", type: "", weight: w, price: null });
+  renderHoldings(); save(); identify();
+  st.className = "hint"; st.textContent = `Added ${tickerOf(isin) || isin} at ${w}%. Total now ${pct(sumWeights())}.`;
+  $("pickName").value = ""; $("pickWeight").value = ""; $("pickName").focus();
+}
+
+/* ---------- the evidence every member reads ---------- */
+function snapshot() {
+  const rows = state.holdings.filter(r => isinOk(r.isin));
+  const raw = rows.reduce((s, r) => s + (num(r.weight) || 0), 0) + (num(state.cash) || 0);
+  const k = raw > 0 ? 100 / raw : 1;
+  const value = num(state.value) > 0 ? num(state.value) : null;
+  const minPts = value ? Math.max(0.1, round(MIN_TRADE_EUR / value * 100, 2)) : MIN_TRADE_PTS;
+  const holdings = rows.map(r => {
+    const id = info(r.isin) || {};
+    return { isin: r.isin, ticker: id.ticker || null, name: nameOf(r) || "unknown", type: typeOf(r) || "unknown",
+      weightPct: round((num(r.weight) || 0) * k, 2), priceEur: num(r.price), priceIsYours: num(r.price) != null,
+      lastKnownPriceEur: num(r.price) ?? id.priceEur ?? null, dailyMovePct: id.dailyMovePct ?? null };
+  });
+  const cashPct = round((num(state.cash) || 0) * k, 2);
+  return {
+    date: today(), value, cashPct, minPts, maxSingle: num(state.maxSingle) ?? 10, holdings,
+    investor: { risk: state.risk, horizon: state.horizon, maxPctInOneCompany: num(state.maxSingle) ?? 10,
+      cashToInvestPct: cashPct, portfolioValueEur: value ?? "not given", minimumTradePts: minPts },
+  };
+}
+function evidenceText(snap) {
+  return `You sit on a private eight-member investment committee for one investor's portfolio; a CIO rules on your ideas.
+Argue from your own lens only - the other members cover the other views. Use the investor's data below and well-established public knowledge.
+You cannot browse and your knowledge has a cutoff, so treat any price or figure from memory as possibly stale and say so. Never invent the investor's numbers.
+The investor makes the final decision; you recommend. Today is ${snap.date}. The base currency is the euro.
+
+## Investor
+${JSON.stringify(snap.investor)}
+
+## Holdings (weights in % of the whole portfolio, cash included)
+${JSON.stringify(snap.holdings.map(({ dailyMovePct, priceIsYours, lastKnownPriceEur, ...x }) => x))}
+
+## Verified ISINs for new lines
+${UNIVERSE.map(u => `${u.isin} ${u.ticker} ${u.name} (${u.type})`).join("\n")}`;
+}
+const PROPOSE = snap => `## Your task
+Propose at most two ideas from your lens: your single best buy (a line already held, or a new line) and your single weakest holding to sell or trim. If nothing clears your bar, propose nothing.
+Size each as sizePct: percentage points of the whole portfolio (3 means 3% of it). Buys are paid from the cash (${snap.cashPct}%) plus any sale proposed; a sale is at most the holding's weight; nothing under ${snap.minPts} points; no single company above ${snap.maxSingle}%.
+ISINs: for a holding, copy it from the table; for a new line, prefer one from the verified list, and give any other only if you are certain of it.
+Give a one-sentence thesis and up to four evidence points with the numbers you used. For each idea also give type ("fund" or "stock"), priceEur (the holding's price from the table, or your best last-known price per share in euro, or null) and dailyMovePct (its typical daily move in %, e.g. 1.2).
+
+Reply with only JSON: {"ideas":[{"action":"buy","isin":"","name":"","type":"fund","sizePct":0,"thesis":"","evidence":[""],"priceEur":null,"dailyMovePct":1.0}]}`;
+
+const RATE = `## Your task
+Rate each of your colleagues' ideas below from -5 (would damage this portfolio by your lens) to +5 (exactly what your lens wants). Use the whole range and say why in one short sentence each.`;
+
+const CIO = snap => `You are the CIO of this committee. The members proposed and peer-rated the ideas below (mean of -5..+5 ratings from the members who did not propose it; spread = disagreement). Sizes are percentage points of the whole portfolio.
+Approve at most three, amend sizes if needed, and reject the rest with a reason each. Rules: buys are paid from the cash (${snap.cashPct}%) plus the sales you approve; no trade under ${snap.minPts} points; no single company above ${snap.maxSingle}% of the portfolio; money needed within about three years stays out of single stocks; never sell more than a holding's weight.
+Prefer ideas the committee broadly agrees on; a contested idea (spread above 3) needs a strong case. If nothing clears the bar, reject everything and say why holding is right.
+Write a 2-3 sentence note to the investor in plain words.
+
+Reply with only JSON: {"decision":"approve|amend|reject","note":"","approved":[{"ideaId":"","sizePct":0,"why":""}],"rejected":[{"ideaId":"","why":""}]}`;
+
+/* ---------- running the sitting ---------- */
+async function ask(prompt, opts) {
+  const ctl = new AbortController();
+  live.add(ctl);
+  try { return await sample.json(prompt, { ...opts, signal: ctl.signal }); }
+  finally { live.delete(ctl); }
+}
+function stopAll(reason) { if (!halt) halt = reason; for (const c of live) c.abort(); }
+async function runPool(tasks, n) {
+  let i = 0;
+  const worker = async () => { while (i < tasks.length && !halt) { const t = tasks[i++]; await t(); } };
+  await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, worker));
+}
+function failMember(where, id, e) {
+  const code = e && e.code;
+  if (FATAL.has(code)) stopAll(code);
+  where[id] = code === "cancelled" ? "stopped" : "failed";
+}
+const HALT_TEXT = {
+  not_granted: "You didn't allow this page to use Claude, so the committee couldn't sit. Reload the page to be asked again.",
+  rate_limited: "Your Claude usage limit was reached part-way. The members who answered are kept; convene again later.",
+  session_expired: "Your Claude session expired. Sign in again, then reload the page.",
+  sampling_disabled: "Claude isn't available for this account.",
+  user: "You stopped the sitting. The members who answered are kept.",
+};
+
+function cleanIdeas(out, snap) {
+  const held = Object.fromEntries(snap.holdings.map(r => [r.isin, r]));
+  return (out && Array.isArray(out.ideas) ? out.ideas : []).slice(0, 2).map(x => {
+    const isin = findIsin(x.isin) || "";
+    const hr = held[isin], known = UNI[isin] || state.ids[isin];
+    return {
+      action: /sell|trim|reduce/i.test(String(x.action)) ? "sell" : "buy", isin,
+      name: (hr && hr.name !== "unknown" && hr.name) || (known && known.name) || String(x.name || "").slice(0, 80),
+      ticker: (known && known.ticker) || "",
+      type: (hr && hr.type !== "unknown" && hr.type) || (known && known.type) || (x.type === "fund" ? "fund" : "stock"),
+      sizePct: num(x.sizePct), thesis: String(x.thesis || "").slice(0, 400),
+      evidence: (Array.isArray(x.evidence) ? x.evidence : []).slice(0, 4).map(s => String(s).slice(0, 240)),
+      priceEur: num(x.priceEur), dailyMovePct: num(x.dailyMovePct), verified: !!(hr || UNI[isin]),
+    };
+  }).filter(x => isinOk(x.isin) && x.sizePct > 0 && (x.action === "buy" || held[x.isin]));
+}
+
+function pool() {
+  const map = new Map();
+  for (const m of MEMBERS) for (const x of (sitting.proposals[m.id] || [])) {
+    const id = `${x.action}-${x.isin}`;
+    if (!map.has(id)) map.set(id, { ...x, id, authors: [], sizes: [], moves: [] });
+    const p = map.get(id);
+    p.authors.push(m.id); p.sizes.push(x.sizePct);
+    if (x.dailyMovePct) p.moves.push(x.dailyMovePct);
+    if (p.authors.length > 1) p.evidence = [...p.evidence, ...x.evidence].slice(0, 4);
+  }
+  const med = a => { const s = [...a].sort((p, q) => p - q); return s.length ? s[Math.floor((s.length - 1) / 2)] : null; };
+  sitting.pooled = [...map.values()].map(p => ({ ...p, sizePct: round(med(p.sizes), 2), dailyMovePct: med(p.moves) }));
+}
+
+function rank() {
+  sitting.ranked = sitting.pooled.map(p => {
+    const scores = MEMBERS.filter(m => !p.authors.includes(m.id))
+      .map(m => sitting.ratings[m.id] && sitting.ratings[m.id][p.id]).filter(r => r && r.score != null).map(r => r.score);
+    const mean = scores.length ? scores.reduce((s, x) => s + x, 0) / scores.length : null;
+    return { id: p.id, mean, spread: scores.length ? Math.max(...scores) - Math.min(...scores) : null };
+  }).sort((a, b) => (b.mean ?? -99) - (a.mean ?? -99));
+}
+
+const label = p => p.ticker || p.isin;
+
+async function convene() {
+  if (!sample || running) return;
+  running = true; halt = null; setConvene();
+  await identify();
+  const snap = snapshot();
+  if (!snap.holdings.length && !snap.cashPct) { running = false; setConvene(); return; }
+  sitting = { at: new Date().toISOString(), snap, phase: "propose", status: {}, proposals: {}, pooled: [], ratings: {}, rstatus: {}, ranked: [], cio: null, orders: [], stopped: [], error: null, example: state.example };
+  startTimer(); render();
+  $("s2").scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const base = evidenceText(snap);
+  await runPool(MEMBERS.map(m => async () => {
+    sitting.status[m.id] = "thinking"; render();
+    try {
+      const out = await ask(`${m.brief}\n\n${base}\n\n${PROPOSE(snap)}`, { modelTier: "default" });
+      sitting.proposals[m.id] = cleanIdeas(out, snap);
+      sitting.status[m.id] = "done";
+    } catch (e) { failMember(sitting.status, m.id, e); }
+    render(); save();
+  }), CONCURRENCY);
+  if (halt) return finish();
+
+  pool();
+  if (!sitting.pooled.length) { sitting.cio = { decision: "reject", note: "No member found a trade worth making. Holding is the committee's view.", approved: [], rejected: [] }; return finish(); }
+
+  sitting.phase = "rate"; render();
+  await runPool(MEMBERS.map(m => async () => {
+    const theirs = sitting.pooled.filter(p => !p.authors.includes(m.id));
+    if (!theirs.length) { sitting.rstatus[m.id] = "done"; sitting.ratings[m.id] = {}; return; }
+    sitting.rstatus[m.id] = "thinking"; render();
+    const list = theirs.map(p => ({ ideaId: p.id, proposer: p.authors.map(a => NAME[a]).join(" + "), action: p.action, isin: p.isin, name: p.name, type: p.type, sizePct: p.sizePct, thesis: p.thesis, evidence: p.evidence }));
+    try {
+      const out = await ask(`${m.brief}\n\n${base}\n\n## Ideas to rate\n${JSON.stringify(list)}\n\n${RATE}\n\nReply with only JSON: {"ratings":{"<ideaId>":{"score":0,"why":""}}} covering every idea listed.`, { modelTier: "default" });
+      const r = (out && out.ratings) || {};
+      sitting.ratings[m.id] = {};
+      for (const p of theirs) {
+        const x = r[p.id]; const s = x && num(x.score);
+        if (s != null) sitting.ratings[m.id][p.id] = { score: clamp(Math.round(s), -5, 5), why: String(x.why || "").slice(0, 300) };
+      }
+      sitting.rstatus[m.id] = "done";
+    } catch (e) { failMember(sitting.rstatus, m.id, e); }
+    render(); save();
+  }), CONCURRENCY);
+  if (halt) return finish();
+
+  rank();
+  sitting.phase = "cio"; render();
+  const table = sitting.ranked.map((r, i) => {
+    const p = sitting.pooled.find(x => x.id === r.id);
+    return { ideaId: p.id, rank: i + 1, proposer: p.authors.map(a => NAME[a]).join(" + "), action: p.action, isin: p.isin, name: p.name, type: p.type,
+      sizePct: p.sizePct, thesis: p.thesis, mean: round(r.mean, 2), spread: r.spread,
+      scores: Object.fromEntries(MEMBERS.filter(m => sitting.ratings[m.id] && sitting.ratings[m.id][p.id]).map(m => [NAME[m.id], sitting.ratings[m.id][p.id]])) };
+  });
+  try {
+    const out = await ask(`${CIO(snap)}\n\n${base}\n\n## The ranked ideas\n${JSON.stringify(table)}`, { modelTier: "complex" });
+    sitting.cio = {
+      decision: ["approve", "amend", "reject"].includes(out && out.decision) ? out.decision : "amend",
+      note: String((out && out.note) || "").slice(0, 900),
+      approved: (out && Array.isArray(out.approved) ? out.approved : []).map(a => ({ ideaId: String(a.ideaId), sizePct: num(a.sizePct), why: String(a.why || "").slice(0, 400) })),
+      rejected: (out && Array.isArray(out.rejected) ? out.rejected : []).map(a => ({ ideaId: String(a.ideaId), why: String(a.why || "").slice(0, 400) })),
+    };
+  } catch (e) {
+    if (FATAL.has(e && e.code)) stopAll(e.code);
+    else if (e && e.code === "cancelled") stopAll("user");
+    else sitting.error = "The CIO didn't answer. The proposals and ratings are kept; convene again to get a ruling.";
+  }
+  finish();
+}
+
+function finish() {
+  running = false; stopTimer();
+  if (!sitting) { setConvene(); return; }
+  if (halt) { sitting.phase = "stopped"; sitting.error = HALT_TEXT[halt] || "The sitting stopped early."; }
+  else if (sitting.error) sitting.phase = "stopped";
+  else { gates(); sitting.phase = "done"; }
+  render(); save();
+}
+
+/* ---------- house rules and limit prices ---------- */
+function gates() {
+  const snap = sitting.snap, cio = sitting.cio;
+  const held = Object.fromEntries(snap.holdings.map(r => [r.isin, r]));
+  const orders = [], stopped = [];
+  for (const a of (cio.approved || [])) {
+    const p = sitting.pooled.find(x => x.id === a.ideaId);
+    if (!p) { stopped.push({ isin: a.ideaId, why: "The CIO named an idea that wasn't on the table." }); continue; }
+    if (orders.length >= MAX_APPROVED) { stopped.push({ ...p, why: `Only ${MAX_APPROVED} trades per sitting.` }); continue; }
+    let size = a.sizePct > 0 ? a.sizePct : p.sizePct;
+    const notes = [];
+    const from = (held[p.isin] && held[p.isin].weightPct) || 0;
+    if (p.action === "sell") {
+      if (!held[p.isin]) { stopped.push({ ...p, why: "Not held, so it can't be sold." }); continue; }
+      if (size > from) { size = from; notes.push("Cut to the whole holding."); }
+    } else if (p.type !== "fund") {
+      const room = snap.maxSingle - from;
+      if (size > room) { size = Math.max(0, room); notes.push(`Cut so it stays at ${snap.maxSingle}% of the portfolio or less.`); }
+    }
+    orders.push({ ...p, size, from, why: a.why, notes });
+  }
+  const sells = orders.filter(o => o.action === "sell").reduce((s, o) => s + o.size, 0);
+  const buys = orders.filter(o => o.action === "buy").reduce((s, o) => s + o.size, 0);
+  const avail = snap.cashPct + sells;
+  if (buys > avail + 0.01) {
+    const f = avail / buys;
+    for (const o of orders) if (o.action === "buy") { o.size *= f; o.notes.push(`Scaled down so buys fit the ${avail.toFixed(1)}% available.`); }
+  }
+  const kept = [];
+  for (const o of orders) {
+    if (o.size < snap.minPts) stopped.push({ ...o, why: `Under the ${snap.minPts}-point minimum after the house rules.` });
+    else kept.push(withLimit(o, held[o.isin], snap));
+  }
+  for (const r of (cio.rejected || [])) {
+    const p = sitting.pooled.find(x => x.id === r.ideaId);
+    if (p) stopped.push({ ...p, why: r.why });
+  }
+  const named = new Set([...(cio.approved || []), ...(cio.rejected || [])].map(x => x.ideaId));
+  for (const p of sitting.pooled) if (!named.has(p.id)) stopped.push({ ...p, why: "Not taken up by the CIO." });
+  sitting.orders = kept; sitting.stopped = stopped;
+}
+
+function withLimit(o, hRow, snap) {
+  const mine = hRow && hRow.priceIsYours ? hRow.priceEur : null;
+  const px = mine ?? (hRow && hRow.lastKnownPriceEur) ?? (state.ids[o.isin] && state.ids[o.isin].priceEur) ?? o.priceEur ?? null;
+  const move = clamp(o.dailyMovePct || (hRow && hRow.dailyMovePct) || (o.type === "fund" ? 1.0 : 2.0), 0.3, 6);
+  const band = clamp(0.8 * move, 0.3, 3) / 100;
+  const to = o.action === "buy" ? o.from + o.size : o.from - o.size;
+  const out = { ...o, to, band, price: px, estimate: mine == null, expires: addSessions(LIMIT_SESSIONS), notes: [...o.notes] };
+  if (snap.value) out.amount = o.size / 100 * snap.value;
+  if (px) {
+    const raw = o.action === "buy" ? px * (1 - band) : px * (1 + band);
+    const dp = priceDp(raw);
+    out.limit = Math.round(raw * 10 ** dp) / 10 ** dp;
+    if (out.amount && !(o.action === "sell" && to < 0.05)) {
+      out.shares = Math.floor(out.amount / out.limit);
+      if (!out.shares) out.notes.push("Less than one share: buy a fraction if your broker allows it, or skip.");
+    }
+    if (out.estimate) out.notes.push(`Price from Claude's memory. Check the live price and keep the limit ${(band * 100).toFixed(1)}% ${o.action === "buy" ? "under" : "over"} it.`);
+  } else out.notes.push(`No price known: set the limit ${(band * 100).toFixed(1)}% ${o.action === "buy" ? "under" : "over"} the live price.`);
+  if (o.action === "sell" && to < 0.05) out.notes.unshift("Sell the whole holding: all your shares.");
+  if (!o.verified) out.notes.push("ISIN not on the verified list: confirm it on the factsheet before ordering.");
+  if (!snap.value) out.notes.push("Add your portfolio value to see the euro amount and shares.");
+  return out;
+}
+
+/* ---------- rendering ---------- */
+function setChip(id, cls, text) { const c = $(id); c.className = "chip " + cls; c.textContent = text; }
+function setStation(id, cls) { const s = $(id); s.classList.remove("run", "done", "fail"); if (cls) s.classList.add(cls); }
+function setMap(n, cls, text) {
+  const li = document.querySelector(`#map li[data-s="${n}"]`);
+  li.classList.remove("run", "done", "fail"); if (cls) li.classList.add(cls);
+  if (text != null) $("m" + n).textContent = text;
+}
+function setConvene() {
+  const b = $("conveneBtn");
+  const has = state.holdings.some(r => isinOk(r.isin)) || num(state.cash) > 0;
+  b.disabled = !claudeReady || running || !has;
+  b.textContent = running ? "The committee is sitting…" : state.example ? "Convene on the example" : sitting && sitting.phase === "done" ? "Convene again" : "Convene the committee";
+  $("stopBtn").hidden = !running;
+}
+
+function render() {
+  setConvene();
+  const s = sitting, ph = s ? s.phase : null;
+  setStation("s1", s ? "done" : null); setMap(1, s ? "done" : null);
+  const proposed = s ? MEMBERS.filter(m => s.status[m.id] === "done").length : 0;
+  const ideaCount = s ? Object.values(s.proposals).reduce((n, a) => n + a.length, 0) : 0;
+  if (!s) { setChip("c2", "", "Waiting"); setStation("s2"); setMap(2, null, "8 members"); }
+  else if (ph === "propose") { setChip("c2", "run", `${proposed} of 8 in`); setStation("s2", "run"); setMap(2, "run", `${proposed} of 8 in`); }
+  else { setChip("c2", proposed ? "done" : "fail", `${proposed} of 8 · ${ideaCount} ideas`); setStation("s2", proposed ? "done" : "fail"); setMap(2, proposed ? "done" : "fail", `${ideaCount} ideas`); }
+  renderMembers();
+  const rated = s ? MEMBERS.filter(m => s.rstatus[m.id] === "done").length : 0;
+  if (!s || ph === "propose") { setChip("c3", "", "Waiting"); setStation("s3"); setMap(3, null, "−5 to +5"); }
+  else if (ph === "rate") { setChip("c3", "run", `${rated} of 8 in`); setStation("s3", "run"); setMap(3, "run", `${rated} of 8 in`); }
+  else if (!s.pooled.length) { setChip("c3", "", "Nothing to rate"); setStation("s3"); setMap(3, null, "Nothing to rate"); }
+  else { setChip("c3", rated ? "done" : "fail", `${rated} of 8 rated`); setStation("s3", rated ? "done" : "fail"); setMap(3, rated ? "done" : "fail", `${s.pooled.length} ideas rated`); }
+  renderRatings();
+  if (!s || ph === "propose" || ph === "rate") { setChip("c4", "", "Waiting"); setStation("s4"); setMap(4, null, "Orders with limits"); }
+  else if (ph === "cio") { setChip("c4", "run", "Ruling"); setStation("s4", "run"); setMap(4, "run", "Ruling…"); }
+  else if (ph === "stopped") { setChip("c4", "fail", "Stopped"); setStation("s4", "fail"); setMap(4, "fail", "Stopped"); }
+  else { const n = s.orders.length; const t = n ? `${n} order${n > 1 ? "s" : ""}` : "Hold"; setChip("c4", "done", t); setStation("s4", "done"); setMap(4, "done", t); }
+  renderRuling();
+}
+
+function ideaLine(x, extra) {
+  return h("div", { class: "line" },
+    h("span", { class: "act " + x.action }, x.action),
+    h("span", { class: "tick", title: x.isin }, label(x)),
+    x.sizePct != null ? h("span", { class: "num" }, `${x.sizePct.toFixed(1)} pts`) : null, extra);
+}
+
+function renderMembers() {
+  const box = $("members"); box.innerHTML = "";
+  const s = sitting;
+  for (const m of MEMBERS) {
+    const st = s ? (s.status[m.id] || (s.phase === "propose" ? "waiting" : "stopped")) : "idle";
+    const ideas = s ? s.proposals[m.id] : null;
+    const text = { idle: "Not yet sat", waiting: "Waiting their turn", thinking: "Thinking…", done: ideas && ideas.length ? `${ideas.length} idea${ideas.length > 1 ? "s" : ""}` : "Nothing clears my bar", failed: "Didn't answer", stopped: "Stopped" }[st];
+    const card = h("article", { class: "member " + st },
+      h("div", { class: "who" }, h("span", { class: "badge", "aria-hidden": "true" }, m.mark),
+        h("div", {}, h("div", { class: "nm" }, m.name), h("div", { class: "lens" }, m.lens))),
+      h("div", { class: "mstate" }, text));
+    for (const x of (ideas || [])) {
+      card.append(h("div", { class: "idea" }, ideaLine(x), h("span", { class: "sub" }, `${x.name} · ${x.isin}`),
+        h("p", { class: "thesis" }, x.thesis),
+        x.evidence.length ? h("ul", { class: "ev" }, x.evidence.map(e => h("li", {}, e))) : null));
+    }
+    box.append(card);
+  }
+}
+
+function scoreStyle(v) {
+  const share = Math.round(Math.abs(v) / 5 * 60);
+  const c = v >= 0 ? "var(--buy)" : "var(--sell)";
+  return `background: color-mix(in oklab, ${c} ${share}%, var(--sheet)); color: ${Math.abs(v) >= 3 ? "var(--sheet)" : "var(--ink)"}`;
+}
+
+function renderRatings() {
+  const box = $("ratings"); box.innerHTML = "";
+  const s = sitting;
+  if (!s || !s.pooled.length) { box.append(h("p", { class: "empty" }, s && s.phase !== "propose" ? "No ideas were proposed, so there is nothing to rate." : "The ratings appear here once the members have proposed.")); return; }
+  const order = s.ranked.length ? s.ranked.map(r => r.id) : s.pooled.map(p => p.id);
+  const stats = Object.fromEntries((s.ranked || []).map(r => [r.id, r]));
+  const thead = h("tr", {}, h("th", {}, "Idea"), MEMBERS.map(m => h("th", { class: "m", title: m.name }, m.mark)), h("th", { class: "n" }, "Mean"), h("th", { class: "n" }, "Spread"));
+  const rows = order.map(id => {
+    const p = s.pooled.find(x => x.id === id); const st = stats[id] || {};
+    return h("tr", {},
+      h("td", { class: "idcell" }, ideaLine(p)),
+      MEMBERS.map(m => {
+        if (p.authors.includes(m.id)) return h("td", { class: "m own", title: `${m.name} proposed it` }, "✎");
+        const r = s.ratings[m.id] && s.ratings[m.id][id];
+        if (!r) return h("td", { class: "m own", title: s.rstatus[m.id] === "thinking" ? "Thinking…" : "No rating" }, s.rstatus[m.id] === "thinking" ? "…" : "·");
+        return h("td", { class: "m", title: `${m.name}: ${r.why}` }, h("span", { style: scoreStyle(r.score) }, (r.score > 0 ? "+" : "") + r.score));
+      }),
+      h("td", { class: "n num" }, st.mean != null ? (st.mean > 0 ? "+" : "") + st.mean.toFixed(1) : "–"),
+      h("td", { class: "n num" }, st.spread != null ? String(st.spread) : "–"));
+  });
+  box.append(h("div", { class: "tablewrap" }, h("table", { class: "matrix" }, h("thead", {}, thead), h("tbody", {}, rows))));
+  const wide = (s.ranked || []).filter(r => r.spread != null).sort((a, b) => b.spread - a.spread)[0];
+  if (wide && wide.spread >= 3) {
+    const p = s.pooled.find(x => x.id === wide.id);
+    const scores = MEMBERS.map(m => ({ m, r: s.ratings[m.id] && s.ratings[m.id][p.id] })).filter(x => x.r);
+    const hi = scores.reduce((a, b) => (b.r.score > a.r.score ? b : a)), lo = scores.reduce((a, b) => (b.r.score < a.r.score ? b : a));
+    box.append(h("p", { class: "callout" }, h("strong", {}, "Widest disagreement: "), `${p.action} ${label(p)}. ${hi.m.name} gave ${hi.r.score > 0 ? "+" : ""}${hi.r.score} (${hi.r.why}) ${lo.m.name} gave ${lo.r.score} (${lo.r.why})`));
+  }
+  const whys = h("div", { class: "whys" });
+  for (const id of order) {
+    const p = s.pooled.find(x => x.id === id);
+    const lines = MEMBERS.map(m => ({ m, r: s.ratings[m.id] && s.ratings[m.id][id] })).filter(x => x.r);
+    if (!lines.length) continue;
+    whys.append(h("div", {}, ideaLine(p, h("span", { class: "hint" }, "proposed by " + p.authors.map(a => NAME[a]).join(" + "))),
+      lines.map(({ m, r }) => h("p", { class: "w" }, h("b", {}, (r.score > 0 ? "+" : "") + r.score), ` ${m.name}: ${r.why}`))));
+  }
+  if (whys.childNodes.length) box.append(h("details", {}, h("summary", {}, "Read every member's reasons"), whys));
+}
+
+function limitText(o) {
+  if (o.limit != null) return eur(o.limit, priceDp(o.limit));
+  return `${o.action === "buy" ? "−" : "+"}${(o.band * 100).toFixed(1)}% from live`;
+}
+function orderText(o) {
+  return `${o.action.toUpperCase()} ${label(o)} (${o.isin}) ${pts(o.action === "buy" ? o.size : -o.size)}, ${pct(o.from)} → ${pct(o.to)}` +
+    (o.amount ? `, ≈ ${eur(o.amount)}` : "") + (o.shares ? `, ${o.shares} shares` : "") +
+    `, limit ${limitText(o)}${o.estimate && o.limit != null ? " (check live price)" : ""}, good till ${o.expires}`;
+}
+
+function renderRuling() {
+  const box = $("ruling"); box.innerHTML = "";
+  const s = sitting;
+  if (!s) { box.append(h("p", { class: "empty" }, "The CIO's note and your orders appear here, each with the new weight, a limit price and an expiry.")); return; }
+  if (s.error) box.append(h("div", { class: "banner bad", role: "status" }, s.error));
+  if (s.phase === "cio") { box.append(h("p", { class: "empty" }, "The CIO is reading the minutes. This is the longest step, often a minute or two.")); return; }
+  if (s.phase !== "done") return;
+  const ruling = h("div", { class: "ruling" });
+  const c = s.cio;
+  ruling.append(h("div", { class: "verdict" },
+    h("div", { class: "stamp " + c.decision }, { approve: "Approved", amend: "Amended", reject: "Hold" }[c.decision]),
+    h("p", { class: "note" }, c.note || "No note.", h("small", {}, `CIO · ${new Date(s.at).toLocaleString("en-IE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}${s.example ? " · on the example portfolio" : ""}`))));
+
+  if (s.orders.length) {
+    const rows = s.orders.map(o => h("tr", {},
+      h("td", {}, h("span", { class: "act " + o.action }, o.action)),
+      h("td", {}, h("span", { class: "tick" }, label(o)), h("div", { class: "hint" }, `${o.name} · ${o.isin}`)),
+      h("td", { class: "n num" }, `${pct(o.from)} → ${pct(o.to)}`, h("div", { class: "hint " + (o.action === "buy" ? "up" : "down") }, pts(o.action === "buy" ? o.size : -o.size))),
+      h("td", { class: "n num" }, o.amount ? eur(o.amount) : "–"),
+      h("td", { class: "n num" }, o.shares ? String(o.shares) : "–"),
+      h("td", { class: "n num" }, limitText(o), h("div", { class: "hint" }, o.price ? `last ${eur(o.price, priceDp(o.price))}${o.estimate ? "*" : ""}` : "")),
+      h("td", { class: "num" }, o.expires),
+      h("td", { class: "why" }, o.why || o.thesis, h("div", { class: "hint" }, "Idea: " + o.authors.map(a => NAME[a]).join(" + ")),
+        o.notes.map(n => h("span", { class: "flagline" }, n)))));
+    ruling.append(h("div", { class: "tablewrap" }, h("table", { class: "orders" },
+      h("thead", {}, h("tr", {}, h("th", {}, ""), h("th", {}, "Holding"), h("th", { class: "n" }, "Weight"), h("th", { class: "n" }, "≈ €"), h("th", { class: "n" }, "Shares"), h("th", { class: "n" }, "Limit"), h("th", {}, "Good till"), h("th", {}, "Why"))),
+      h("tbody", {}, rows))));
+    const copy = h("button", { class: "btn quiet" }, "Copy the orders");
+    copy.addEventListener("click", async () => {
+      const text = s.orders.map(orderText).join("\n");
+      try { await navigator.clipboard.writeText(text); copy.textContent = "Copied"; }
+      catch { const t = h("textarea", { style: "width:100%;min-height:80px" }); t.value = text; copy.replaceWith(t); t.select(); }
+    });
+    ruling.append(h("div", { class: "row" }, copy,
+      h("span", { class: "hint" }, `Buy limits sit under the last price and sell limits over it, by 0.8 of the line's usual daily move. If an order hasn't filled after ${LIMIT_SESSIONS} trading days, check the price again before moving it.`)));
+  } else {
+    ruling.append(h("p", { class: "empty" }, "No orders this sitting. Keep the cash where it is and convene again when something changes."));
+  }
+
+  if (s.stopped.length) {
+    const top = (s.ranked || []).find(r => s.stopped.some(x => x.id === r.id));
+    ruling.append(h("div", {}, h("h3", { style: "font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px" }, "Stopped"),
+      h("ul", { class: "stopped" }, s.stopped.map(x => h("li", {},
+        x.action ? h("span", { class: "act " + x.action, style: "margin-right:6px" }, x.action) : null,
+        h("span", { class: "tick", title: x.isin }, x.ticker || x.isin), x.why,
+        top && x.id === top.id ? h("span", { class: "chip warn", style: "margin-left:8px" }, "top-rated") : null)))));
+  }
+  ruling.append(h("p", { class: "fine" }, "The committee recommends; you decide and place any order yourself. Prices marked * come from Claude's memory and may be stale."));
+  box.append(ruling);
+}
+
+/* ---------- timer ---------- */
+function startTimer() {
+  const t0 = Date.now(); stopTimer();
+  timerId = setInterval(() => {
+    const sec = Math.floor((Date.now() - t0) / 1000);
+    const step = { propose: "Proposals", rate: "Ratings", cio: "CIO ruling" }[sitting && sitting.phase] || "";
+    $("timer").textContent = `${step} · ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+  }, 1000);
+}
+function stopTimer() { if (timerId) clearInterval(timerId); timerId = null; $("timer").textContent = ""; }
+
+/* ---------- wiring ---------- */
+function showTab(which) {
+  const up = which === "upload";
+  $("tabUpload").setAttribute("aria-selected", String(up)); $("tabPick").setAttribute("aria-selected", String(!up));
+  $("pUpload").hidden = !up; $("pPick").hidden = up;
+  try { localStorage.setItem(KEY + ":tab", which); } catch {}
+}
+$("tabUpload").addEventListener("click", () => showTab("upload"));
+$("tabPick").addEventListener("click", () => { showTab("pick"); $("pickName").focus(); });
+$("universe").append(...UNIVERSE.map(u => h("option", { value: `${u.ticker} · ${u.name} · ${u.isin}` })));
+$("pickAdd").addEventListener("click", addPicked);
+$("pickWeight").addEventListener("keydown", e => { if (e.key === "Enter") addPicked(); });
+$("pickName").addEventListener("keydown", e => { if (e.key === "Enter") $("pickWeight").focus(); });
+
+$("addRow").addEventListener("click", () => { state.holdings.push({ isin: "", name: "", type: "", weight: null, price: null }); markOwned(); renderHoldings(); save(); });
+$("clearAll").addEventListener("click", () => { state.holdings = []; state.cash = null; $("cash").value = ""; markOwned(); renderHoldings(); save(); });
+$("readBtn").addEventListener("click", () => { const t = $("paste").value.trim(); if (t) readHoldings(t, null); else { $("readState").className = "hint flag"; $("readState").textContent = "Paste the lines first, or upload a file."; } });
+$("file").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  if (f.type.startsWith("image/")) {
+    if (!imagesOK) { $("readState").className = "hint flag"; $("readState").textContent = "Screenshots can't be read in this view. Upload a CSV in the format above instead."; return; }
+    readHoldings(null, f);
+  } else {
+    const text = await f.text();
+    $("paste").value = text.slice(0, 20000);
+    readHoldings(text, null);
+  }
+});
+$("copyTpl").addEventListener("click", async () => {
+  const b = $("copyTpl"), text = $("template").textContent;
+  try { await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
+  catch { $("pasteBox").open = true; $("paste").value = text; $("paste").select(); b.textContent = "Template is in the paste box"; }
+  setTimeout(() => { b.textContent = "Copy the template"; }, 2500);
+});
+$("conveneBtn").addEventListener("click", convene);
+$("stopBtn").addEventListener("click", () => stopAll("user"));
+$("paste").addEventListener("input", () => { try { localStorage.setItem(KEY + ":paste", $("paste").value); } catch {} });
+
+load();
+try { $("paste").value = localStorage.getItem(KEY + ":paste") || ""; if (localStorage.getItem(KEY + ":tab") === "pick") showTab("pick"); } catch {}
+bindSituation(); renderExampleChip(); renderHoldings(); render();
+
+(async () => {
+  const banner = $("claudeBanner");
+  try { sample = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sample = null; }
+  if (!sample) {
+    banner.hidden = false;
+    if (window.claude) {
+      banner.textContent = "Sign in to Claude to convene the committee: it runs on your own Claude account. You can still load and check your holdings.";
+    } else {
+      // Off claude.ai (e.g. the GitHub site): the committee sits in the Claude version of this page.
+      banner.replaceChildren("The committee sits inside Claude and runs on your own Claude account. ",
+        h("a", { href: $("openClaude").href, target: "_blank", rel: "noopener" }, "Open Committee Room in Claude"),
+        ", sign in, and load your holdings there. A table filled in here doesn't carry over.");
+      $("conveneBtn").hidden = true;
+      $("openClaude").hidden = false;
+    }
+    $("file").accept = ".csv,.txt,.tsv";
+    $("readState").textContent = "";
+    return;
+  }
+  try { const caps = await sample.limits(); imagesOK = !!(caps && caps.images); } catch { imagesOK = false; }
+  if (!imagesOK) { $("file").accept = ".csv,.txt,.tsv"; $("readState").textContent = ""; }
+  claudeReady = true;
+  setConvene();
+  identify();
+})();
+</script>
+
+</body>
+</html>
