@@ -1,240 +1,265 @@
 <title>Claude Committee Advisor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
-/* Layout: one vertical process rail. A compact map of the four stations heads the page;
-   each station is a section hung off the same line, filled in as the committee sits. */
+/* Layout: Bond Portfolio Centre's look. White masthead with a solid black mark, a sticky grey
+   process bar (the four stations), then each station under a ruled grey section head, its
+   content in square bordered panels with grey title bars. */
 :root {
-  --paper: #ECEFEA; --sheet: #F8F9F6; --ink: #16202A; --muted: #5A6570; --rule: #C9D0C8;
-  --accent: #2343A6; --accent-ink: #FFFFFF; --buy: #16704A; --sell: #B0302A; --warn: #9A6400;
-  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --prose: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --ink: #1C1C1E; --slate: #5B5B62; --paper: #FFFFFF; --mist: #F6F5F3;
+  --line: #E6E3DE; --line-soft: #EFEDE9; --line-strong: #6B6F7B;
+  --accent: #0F7E82; --accent-dark: #0A5C5F; --green: #1E7A46; --loss: #B9002F; --amber: #8A5A00; --shade: #EAF4F4;
+  --buy: var(--green); --sell: var(--loss); --sheet: var(--paper); --muted: var(--slate); --warn: var(--amber); --rule: var(--line);
+  --fs-1: 13px; --fs-2: 15px; --fs-3: 17px; --fs-4: 22px; --fs-5: 30px;
+  --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0F1418; --sheet: #161D23; --ink: #E4E8EC; --muted: #93A0AC; --rule: #2A343D;
-    --accent: #8AA3FF; --accent-ink: #0F1418; --buy: #4CC08A; --sell: #F27B71; --warn: #E1AA3E;
+    --ink: #E6EDF3; --slate: #9AA4B2; --paper: #161B22; --mist: #0D1117;
+    --line: #2A313C; --line-soft: #222933; --line-strong: #8B95A3;
+    --accent: #2DD4BF; --accent-dark: #14B8A6; --green: #3FB950; --loss: #F85149; --amber: #E3A83A; --shade: #12312E;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0F1418; --sheet: #161D23; --ink: #E4E8EC; --muted: #93A0AC; --rule: #2A343D;
-  --accent: #8AA3FF; --accent-ink: #0F1418; --buy: #4CC08A; --sell: #F27B71; --warn: #E1AA3E;
+  --ink: #E6EDF3; --slate: #9AA4B2; --paper: #161B22; --mist: #0D1117;
+  --line: #2A313C; --line-soft: #222933; --line-strong: #8B95A3;
+  --accent: #2DD4BF; --accent-dark: #14B8A6; --green: #3FB950; --loss: #F85149; --amber: #E3A83A; --shade: #12312E;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--paper); color: var(--ink); font-family: var(--display); font-size: 15px; line-height: 1.45; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+body { margin: 0; font-family: var(--sans); font-size: var(--fs-2); line-height: 1.5; color: var(--ink); background: var(--paper); }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 p { margin: 0; }
-.num, td.n, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num, td.n, .mono { font-variant-numeric: tabular-nums; }
+.mono, .tick, .num { font-family: var(--mono); }
+.mono { font-size: var(--fs-1); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Masthead */
-header.top { display: grid; gap: 6px; padding-bottom: 22px; }
-.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-h1 { font-size: clamp(30px, 6vw, 46px); font-weight: 800; font-stretch: 118%; letter-spacing: -.01em; line-height: 1.05; }
-.lede { font-family: var(--prose); font-size: 17px; color: var(--muted); max-width: 62ch; }
+.masthead { background: var(--paper); border-bottom: 1px solid var(--line); }
+.masthead-inner { max-width: 1240px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.logo-box { background: var(--ink); color: var(--paper); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--fs-1); font-weight: 700; letter-spacing: .04em; flex: none; }
+.centre-title { font-size: var(--fs-4); font-weight: 300; letter-spacing: -.01em; line-height: 1.15; }
+.centre-title strong { font-weight: 700; }
+.strap { font-size: var(--fs-1); color: var(--slate); }
+.strap b { font-weight: 600; color: inherit; }
 
-/* The map */
-ol.map { list-style: none; margin: 0 0 8px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-ol.map li { position: relative; display: grid; gap: 2px; justify-items: start; padding-top: 30px; padding-right: 8px; }
-ol.map li::before { content: ""; position: absolute; top: 11px; left: 0; right: 0; height: 2px; background: var(--rule); }
-ol.map li:last-child::before { right: auto; width: 24px; }
-ol.map li.done::before { background: var(--buy); }
-ol.map li.run::before { background: linear-gradient(90deg, var(--accent) 50%, var(--rule) 50%); }
-ol.map a { color: inherit; text-decoration: none; display: grid; gap: 2px; }
-.dot { position: absolute; top: 0; left: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--sheet); border: 2px solid var(--rule); font: 600 12px/1 var(--mono); }
-li.run .dot { border-color: var(--accent); color: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
-li.done .dot { background: var(--buy); border-color: var(--buy); color: var(--sheet); }
-li.fail .dot { border-color: var(--sell); color: var(--sell); }
-.mapname { font-weight: 700; font-size: 14px; font-stretch: 110%; }
-.mapstate { font-size: 12px; color: var(--muted); }
-@keyframes pulse { 50% { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 22%, transparent); } }
+/* Process bar: the four stations, sticky like Bond's tab row */
+.navbar { background: var(--mist); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+.navbar-inner { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+ol.map { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+ol.map li { border-bottom: 3px solid transparent; min-width: 0; }
+ol.map a { display: flex; gap: 10px; align-items: center; padding: 10px 10px 9px 0; color: inherit; text-decoration: none; min-width: 0; }
+ol.map a > span:last-child { min-width: 0; }
+.dot { flex: none; width: 24px; height: 24px; display: inline-grid; place-items: center; border: 1px solid var(--line-strong);
+  background: var(--paper); font: 600 var(--fs-1)/1 var(--mono); }
+.mapname { display: block; font-size: var(--fs-2); }
+.mapstate { display: block; font-size: var(--fs-1); color: var(--slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ol.map li.run { border-bottom-color: var(--accent); }
+ol.map li.run .dot { border-color: var(--accent); color: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+ol.map li.done { border-bottom-color: var(--ink); }
+ol.map li.done .dot { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+ol.map li.fail .dot { border-color: var(--loss); color: var(--loss); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); } }
+@media (max-width: 640px) { .mapstate { display: none; } ol.map a { gap: 6px; } .mapname { font-size: var(--fs-1); } }
 
-/* How it works */
-.how { padding: 18px 0 24px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
-.howtitle { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-.howgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.howgrid b { font-size: 13.5px; font-stretch: 108%; }
-.howgrid p { font-family: var(--prose); font-size: 14.5px; margin-top: 4px; }
-ul.facts { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px dashed var(--rule); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; font-size: 13px; color: var(--muted); }
-ul.facts b { color: var(--ink); }
-@media (max-width: 760px) { .howgrid, ul.facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 460px) { .howgrid, ul.facts { grid-template-columns: 1fr; } }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 64px; }
 
-/* Stations */
-section.station { position: relative; padding: 28px 0 28px 46px; border-bottom: 1px solid var(--rule); }
-section.station::before { content: ""; position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
-section.station:first-child::before { top: 30px; }
-section.station:last-child::before { bottom: auto; height: 30px; }
-.marker { position: absolute; left: 0; top: 26px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--paper); border: 2px solid var(--ink); font: 600 13px/1 var(--mono); }
-.station.done .marker { background: var(--buy); border-color: var(--buy); color: var(--sheet); }
-.station.run .marker { border-color: var(--accent); color: var(--accent); }
-.station.fail .marker { border-color: var(--sell); color: var(--sell); }
-.sthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
-h2 { font-size: 22px; font-weight: 750; font-stretch: 112%; }
-.stdesc { color: var(--muted); max-width: 70ch; margin-bottom: 18px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
-.chip.run { border-color: var(--accent); color: var(--accent); }
-.chip.done { border-color: var(--buy); color: var(--buy); }
-.chip.fail { border-color: var(--sell); color: var(--sell); }
-.chip.warn { border-color: var(--warn); color: var(--warn); }
+/* Section heads: Bond's ruled grey bar */
+.section-head, .sthead { border-top: 3px solid var(--ink); background: var(--mist); padding: 8px 16px; margin-bottom: 12px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+.section-head h2, .sthead h2 { font-size: var(--fs-3); font-weight: 600; letter-spacing: -.01em; }
+.marker { flex: none; width: 24px; height: 24px; display: inline-grid; place-items: center; background: var(--ink); color: var(--paper);
+  font: 600 var(--fs-1)/1 var(--mono); }
+.station.run .marker { background: var(--accent); }
+.station.fail .marker { background: var(--loss); }
+section.station { margin-top: 32px; }
+.stdesc { font-size: var(--fs-1); color: var(--slate); max-width: 90ch; margin: 0 0 16px; }
+.chip { display: inline-block; font-size: var(--fs-1); padding: 1px 7px; border: 1px solid currentColor; color: var(--slate); white-space: nowrap; }
+.chip.run { color: var(--accent); } .chip.done { color: var(--green); } .chip.fail { color: var(--loss); } .chip.warn { color: var(--amber); }
 
-/* Station 1: holdings */
-.loadgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+/* How it works: Bond's KPI tiles, one per station */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.kpi { background: var(--paper); padding: 14px 16px; min-width: 0; }
+.kpi .k { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .07em; color: var(--slate); margin-bottom: 6px; }
+.kpi p { font-size: var(--fs-1); }
+.kpis.facts { margin-top: 12px; }
+.kpis.facts .kpi { background: var(--mist); }
+.kpis.facts b { display: block; font-size: var(--fs-2); margin-bottom: 2px; }
+@media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .kpis { grid-template-columns: 1fr; } }
+
+/* Panels */
+.loadgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 @media (max-width: 760px) { .loadgrid { grid-template-columns: 1fr; } }
-.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
-.card h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
-textarea, input[type=text], input[type=number], input[type=search], select { width: 100%; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 10px; font-size: 16px; }
-textarea { min-height: 120px; resize: vertical; font-family: var(--mono); font-size: 14px; }
+.card { border: 1px solid var(--line); background: var(--paper); padding: 0 16px 16px; display: grid; gap: 12px; min-width: 0; }
+.card > h3, .cardhead { margin: 0 -16px; padding: 12px 16px; background: var(--mist); border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-2); font-weight: 600; }
+.cardhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.cardhead h3 { font-size: var(--fs-2); font-weight: 600; }
+.panel { display: grid; gap: 12px; }
+.format pre { margin: 0; padding: 10px 12px; background: var(--mist); border: 1px solid var(--line); font: var(--fs-1)/1.6 var(--mono); overflow-x: auto; }
+dl.cols { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: var(--fs-1); }
+dl.cols dt { font-family: var(--mono); font-weight: 600; }
+dl.cols dd { margin: 0; color: var(--slate); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font-size: var(--fs-1); padding: 4px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.pick { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: end; }
+.pick label, .fields label { display: grid; gap: 4px; font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .06em; color: var(--slate); }
+@media (max-width: 460px) { .pick { grid-template-columns: minmax(0, 1fr) 90px; } .pick .btn { grid-column: 1 / -1; justify-content: center; } }
+.fields { display: grid; gap: 12px; }
+input[type=text], input[type=number], input[type=search], select, textarea { width: 100%; max-width: 100%; padding: 6px 9px; border: 1px solid var(--line-strong);
+  border-radius: 0; background: var(--paper); color: var(--ink); font-size: var(--fs-2); }
+input:hover, select:hover, textarea:hover { border-color: var(--accent); }
+textarea { min-height: 110px; resize: vertical; font-family: var(--mono); font-size: var(--fs-1); }
+@media (max-width: 640px) { input[type=text], input[type=number], input[type=search], select, textarea { font-size: 16px; } }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--ink); background: transparent; border-radius: 4px; padding: 8px 14px; font-weight: 650; cursor: pointer; }
-.btn:hover:not(:disabled) { background: color-mix(in oklab, var(--ink) 8%, transparent); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn.primary:hover:not(:disabled) { background: color-mix(in oklab, var(--accent) 86%, var(--ink)); }
-.btn.quiet { border-color: var(--rule); }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  font-size: var(--fs-1); font-weight: 600; cursor: pointer; border-radius: 0; text-decoration: none; }
+.btn:hover:not(:disabled) { background: var(--mist); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 85%, var(--paper)); }
+.btn.quiet { border-color: var(--line-strong); }
+.btn.big { font-size: var(--fs-2); padding: 10px 20px; }
+#conveneBtn, #openClaude { background: var(--accent); border-color: var(--accent); color: #fff; }
+#conveneBtn:hover:not(:disabled), #openClaude:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn.big { font-size: 17px; padding: 12px 20px; font-stretch: 110%; }
 .filebtn { position: relative; overflow: hidden; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.hint { font-size: 13px; color: var(--muted); }
-.hint.flag, .flag { color: var(--warn); }
-.fields { display: grid; gap: 10px; }
-.fields label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; }
-.tabs { display: inline-flex; border: 1px solid var(--rule); border-radius: 5px; padding: 2px; gap: 2px; justify-self: start; }
-.tabs button { border: 0; background: none; padding: 6px 12px; border-radius: 3px; font-weight: 650; font-size: 14px; cursor: pointer; color: var(--muted); }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--sheet); }
-.panel { display: grid; gap: 12px; }
-.format pre { margin: 0; padding: 10px 12px; background: var(--paper); border: 1px dashed var(--rule); border-radius: 4px; font: 13px/1.6 var(--mono); overflow-x: auto; }
-dl.cols { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: 13px; }
-dl.cols dt { font-family: var(--mono); font-weight: 500; }
-dl.cols dd { margin: 0; color: var(--muted); }
-.pick { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: end; }
-.pick label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; }
-@media (max-width: 460px) { .pick { grid-template-columns: minmax(0, 1fr) 90px; } .pick .btn { grid-column: 1 / -1; justify-content: center; } }
-
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; }
-th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-td { padding: 6px 8px; border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent); vertical-align: top; }
-th.n, td.n { text-align: right; }
-table.hold input, table.hold select { padding: 6px 8px; min-width: 0; }
-table.hold td { padding: 4px; vertical-align: middle; }
-table.hold .i { width: 150px; } table.hold .nm { min-width: 190px; } table.hold .ty { width: 92px; } table.hold .w { width: 86px; } table.hold .p { width: 100px; }
-table.hold input.isin { font-family: var(--mono); font-size: 14px; letter-spacing: .02em; }
-table.hold input.bad { border-color: var(--sell); }
-table.hold .src { display: block; font-size: 11.5px; color: var(--muted); padding: 2px 2px 0; }
-table.hold tfoot td { font-weight: 600; border-bottom: 0; }
-table.hold tfoot .sum td { font-weight: 700; padding-top: 10px; }
-.x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px 8px; }
-.x:hover { color: var(--sell); }
-.banner { border: 1px solid var(--warn); background: color-mix(in oklab, var(--warn) 10%, var(--sheet)); padding: 10px 14px; border-radius: 6px; font-size: 14px; }
-.banner.bad { border-color: var(--sell); background: color-mix(in oklab, var(--sell) 9%, var(--sheet)); }
+.hint { font-size: var(--fs-1); color: var(--slate); }
+.hint.flag, .flag { color: var(--amber); }
+.banner { background: color-mix(in srgb, var(--amber) 12%, var(--paper)); border-left: 3px solid var(--amber); padding: 10px 14px; font-size: var(--fs-1); margin-bottom: 16px; }
+.banner.bad { background: color-mix(in srgb, var(--loss) 8%, var(--paper)); border-left-color: var(--loss); }
+.banner a { color: var(--accent); }
 .convene { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 20px; }
-.timer { font-family: var(--mono); color: var(--muted); }
+.timer { font-family: var(--mono); font-size: var(--fs-1); color: var(--slate); }
+
+/* Tables: Bond's grid */
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-1); }
+th { text-align: left; font-size: var(--fs-1); text-transform: uppercase; letter-spacing: .06em; color: var(--slate); font-weight: 600;
+  padding: 8px 10px; background: var(--mist); border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; font-variant-numeric: tabular-nums; }
+tbody tr:hover { background: var(--mist); }
+th.n, td.n { text-align: right; }
+table.hold td { padding: 4px; vertical-align: middle; }
+table.hold input, table.hold select { padding: 5px 7px; min-width: 0; }
+table.hold .i { width: 150px; } table.hold .nm { min-width: 190px; } table.hold .ty { width: 92px; } table.hold .w { width: 86px; } table.hold .p { width: 100px; }
+table.hold input.isin { font-family: var(--mono); letter-spacing: .02em; }
+table.hold input.bad { border-color: var(--loss); }
+table.hold .src { display: block; font-size: 12px; color: var(--slate); padding: 2px 2px 0; }
+table.hold tfoot td { font-weight: 600; border-bottom: 0; background: var(--paper); }
+table.hold tfoot .sum td { padding-top: 10px; }
+.x { border: 0; background: none; color: var(--slate); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.x:hover { color: var(--loss); }
 
 /* Station 2: members */
-.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-.member { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.member { background: var(--paper); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .member .who { display: flex; align-items: center; gap: 10px; }
-.badge { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 12px/1 var(--mono); border: 1.5px solid var(--ink); }
-.member.thinking .badge { border-color: var(--accent); color: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
-.member.failed { border-style: dashed; }
-.member .nm { font-weight: 700; font-stretch: 108%; line-height: 1.2; }
-.member .lens { font-size: 12.5px; color: var(--muted); }
-.mstate { font-size: 12px; color: var(--muted); font-family: var(--mono); }
-.idea { border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 4px; }
+.badge { flex: none; width: 34px; height: 34px; display: grid; place-items: center; background: var(--ink); color: var(--paper); font: 600 12px/1 var(--mono); }
+.member.thinking .badge { background: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+.member.failed .badge, .member.stopped .badge { background: var(--slate); }
+.member .nm { font-weight: 600; line-height: 1.2; }
+.member .lens { font-size: var(--fs-1); color: var(--slate); }
+.mstate { font-size: var(--fs-1); color: var(--slate); }
+.member.thinking .mstate { color: var(--accent); }
+.idea { border-top: 1px solid var(--line-soft); padding-top: 8px; display: grid; gap: 4px; }
 .line { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
-.act { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border-radius: 3px; color: var(--sheet); }
-.act.buy { background: var(--buy); } .act.sell { background: var(--sell); }
-.tick { font-family: var(--mono); font-weight: 500; }
-.sub { font-size: 12.5px; color: var(--muted); }
-.thesis { font-family: var(--prose); font-size: 14.5px; }
-ul.ev { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--muted); }
+.act { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; color: #fff; }
+.act.buy { background: var(--green); } .act.sell { background: var(--loss); }
+.tick { font-weight: 600; font-size: var(--fs-1); }
+.sub { font-size: var(--fs-1); color: var(--slate); }
+.thesis { font-size: var(--fs-1); }
+ul.ev { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--slate); }
 
-/* Station 3: matrix */
+/* Station 3: ratings matrix */
 table.matrix th.m, table.matrix td.m { text-align: center; width: 44px; padding: 6px 2px; }
-table.matrix td.m { font-family: var(--mono); font-size: 13px; }
-table.matrix td.m span { display: inline-grid; place-items: center; width: 34px; height: 26px; border-radius: 3px; }
-table.matrix .own { color: var(--muted); font-size: 12px; }
+table.matrix td.m { font-family: var(--mono); }
+table.matrix td.m span { display: inline-grid; place-items: center; min-width: 32px; height: 24px; border-radius: 10px; }
+table.matrix .own { color: var(--slate); }
 .idcell { white-space: nowrap; }
-details { margin-top: 4px; }
-summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+details { margin-top: 8px; }
+summary { cursor: pointer; font-weight: 600; font-size: var(--fs-1); color: var(--accent); }
 .whys { display: grid; gap: 10px; margin-top: 10px; }
-.whys .w { font-size: 13.5px; }
-.whys .w b { font-family: var(--mono); font-weight: 500; }
-.callout { font-size: 14px; padding: 10px 0; }
+.whys .w { font-size: var(--fs-1); }
+.whys .w b { font-family: var(--mono); }
+.callout { font-size: var(--fs-1); padding: 10px 0; }
 
-/* Station 4: ruling */
+/* Station 4: the ruling (Bond's key panel: teal top rule) */
 .ruling { display: grid; gap: 18px; }
-.verdict { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; background: var(--sheet); border: 1px solid var(--ink); border-radius: 6px; padding: 18px; }
+.verdict { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; border: 1px solid var(--accent);
+  box-shadow: inset 0 3px 0 var(--accent); background: var(--paper); padding: 18px 16px 16px; }
 @media (max-width: 560px) { .verdict { grid-template-columns: 1fr; } }
-.stamp { font: 800 15px/1 var(--display); font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; padding: 10px 12px; border: 2.5px solid currentColor; border-radius: 4px; transform: rotate(-3deg); justify-self: start; }
-.stamp.approve { color: var(--buy); } .stamp.amend { color: var(--warn); } .stamp.reject { color: var(--sell); }
-.note { font-family: var(--prose); font-size: 18px; line-height: 1.5; max-width: 64ch; }
-.note small { display: block; font-family: var(--display); font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: .04em; text-transform: uppercase; }
+.stamp { font-size: var(--fs-1); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border: 2px solid currentColor; justify-self: start; }
+.stamp.approve { color: var(--green); } .stamp.amend { color: var(--amber); } .stamp.reject { color: var(--loss); }
+.note { font-size: var(--fs-3); line-height: 1.5; max-width: 72ch; }
+.note small { display: block; font-size: var(--fs-1); color: var(--slate); margin-top: 8px; text-transform: uppercase; letter-spacing: .06em; }
 table.orders td { white-space: nowrap; }
-table.orders td.why { white-space: normal; font-family: var(--prose); font-size: 14px; min-width: 240px; }
-.flagline { display: block; font-size: 12.5px; color: var(--warn); margin-top: 3px; font-family: var(--display); }
-.up { color: var(--buy); } .down { color: var(--sell); }
+table.orders td.why { white-space: normal; min-width: 240px; }
+.flagline { display: block; font-size: 12.5px; color: var(--amber); margin-top: 3px; }
+.up { color: var(--green); } .down { color: var(--loss); }
 .stopped { display: grid; gap: 6px; padding: 0; margin: 0; list-style: none; }
-.stopped li { font-size: 14px; }
+.stopped li { font-size: var(--fs-1); }
 .stopped .tick { margin-right: 6px; }
-.fine { font-size: 12.5px; color: var(--muted); max-width: 80ch; }
-.empty { color: var(--muted); font-family: var(--prose); font-size: 15px; }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.fine { font-size: var(--fs-1); color: var(--slate); max-width: 90ch; }
+.empty { color: var(--slate); font-size: var(--fs-1); padding: 12px 16px; border: 1px dashed var(--line-strong); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-@media (max-width: 520px) { section.station { padding-left: 40px; } .mapname { font-size: 12.5px; } }
 </style>
 
-<div class="wrap">
-  <header class="top">
-    <span class="eyebrow">Investment committee · one sitting</span>
-    <h1>Claude Committee Advisor</h1>
-    <p class="lede">Load your holdings by ISIN and weight. Eight members with different lenses each propose a trade, then rate each other's ideas. The CIO rules, and every approved trade comes with a new weight, a limit price and an expiry.</p>
-  </header>
-
-  <ol class="map" id="map" aria-label="The four stations">
-    <li data-s="1"><span class="dot">1</span><a href="#s1"><span class="mapname">Holdings</span><span class="mapstate" id="m1">Example loaded</span></a></li>
-    <li data-s="2"><span class="dot">2</span><a href="#s2"><span class="mapname">Proposals</span><span class="mapstate" id="m2">8 members</span></a></li>
-    <li data-s="3"><span class="dot">3</span><a href="#s3"><span class="mapname">Peer ratings</span><span class="mapstate" id="m3">−5 to +5</span></a></li>
-    <li data-s="4"><span class="dot">4</span><a href="#s4"><span class="mapname">CIO ruling</span><span class="mapstate" id="m4">Orders with limits</span></a></li>
-  </ol>
-
-  <section class="how" id="how" aria-labelledby="howTitle">
-    <h2 id="howTitle" class="howtitle">How it works</h2>
-    <div class="howgrid">
-      <div><b>1 · Holdings</b><p>Upload a CSV of ISINs and weights, or choose each holding from the list. Set your risk, horizon and the most you'll hold in one company.</p></div>
-      <div><b>2 · Proposals</b><p>Eight members, each with one lens (data, news, US tech, income, growth, research, goals, tax and cost), propose their best buy and their weakest holding to sell.</p></div>
-      <div><b>3 · Peer ratings</b><p>Each member scores the ideas they didn't propose from −5 to +5. Ideas are ranked by the average score; a wide spread marks a contested idea.</p></div>
-      <div><b>4 · CIO ruling</b><p>The CIO approves up to three trades. House rules check the weights add up, the minimum trade and your cap on one company. Each order gets a new weight, a limit and an expiry.</p></div>
+<header class="masthead">
+  <div class="masthead-inner">
+    <span class="logo-box" aria-hidden="true">CCA</span>
+    <div>
+      <h1 class="centre-title">Claude Committee <strong>Advisor</strong></h1>
+      <div class="strap">Eight AI members propose and rate trades, the CIO rules · personal research tool, <b>not investment advice</b></div>
     </div>
-    <ul class="facts">
-      <li><b>Your account.</b> 17 calls to Claude per sitting, about 3 to 6 minutes.</li>
-      <li><b>Weights first.</b> Trades are in points of the portfolio. Add its value to see euro amounts and shares.</li>
-      <li><b>Limits.</b> Set 0.8 of the line's usual daily move from the last price, good for 5 trading days.</li>
-      <li><b>Private.</b> Holdings and the last sitting stay in this browser. You place any order yourself.</li>
-    </ul>
+  </div>
+</header>
+
+<nav class="navbar" aria-label="The four stations">
+  <div class="navbar-inner">
+    <ol class="map" id="map">
+      <li data-s="1"><a href="#s1"><span class="dot">1</span><span><span class="mapname">Holdings</span><span class="mapstate" id="m1">Example loaded</span></span></a></li>
+      <li data-s="2"><a href="#s2"><span class="dot">2</span><span><span class="mapname">Proposals</span><span class="mapstate" id="m2">8 members</span></span></a></li>
+      <li data-s="3"><a href="#s3"><span class="dot">3</span><span><span class="mapname">Peer ratings</span><span class="mapstate" id="m3">−5 to +5</span></span></a></li>
+      <li data-s="4"><a href="#s4"><span class="dot">4</span><span><span class="mapname">CIO ruling</span><span class="mapstate" id="m4">Orders with limits</span></span></a></li>
+    </ol>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section id="how" aria-labelledby="howTitle">
+    <div class="section-head"><h2 id="howTitle">How it works</h2></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">1 · Holdings</div><p>Upload a CSV of ISINs and weights, or choose each holding from the list. Set your risk, horizon and the most you'll hold in one company.</p></div>
+      <div class="kpi"><div class="k">2 · Proposals</div><p>Eight members, each with one lens (data, news, US tech, income, growth, research, goals, tax and cost), propose their best buy and their weakest holding to sell.</p></div>
+      <div class="kpi"><div class="k">3 · Peer ratings</div><p>Each member scores the ideas they didn't propose from −5 to +5. Ideas are ranked by the average score; a wide spread marks a contested idea.</p></div>
+      <div class="kpi"><div class="k">4 · CIO ruling</div><p>The CIO approves up to three trades. House rules check the weights add up, the minimum trade and your cap on one company. Each order gets a new weight, a limit and an expiry.</p></div>
+    </div>
+    <div class="kpis facts">
+      <div class="kpi"><b>Your account</b><p>17 calls to Claude per sitting, about 3 to 6 minutes.</p></div>
+      <div class="kpi"><b>Weights first</b><p>Trades are in points of the portfolio. Add its value to see euro amounts and shares.</p></div>
+      <div class="kpi"><b>Limits</b><p>Set 0.8 of the line's usual daily move from the last price, good for 5 trading days.</p></div>
+      <div class="kpi"><b>Private</b><p>Holdings and the last sitting stay in this browser. You place any order yourself.</p></div>
+    </div>
   </section>
 
   <div class="stations">
     <!-- 1 -->
     <section class="station" id="s1">
-      <span class="marker">1</span>
-      <div class="sthead"><h2>Load your holdings</h2><span class="chip" id="exampleChip">Example data</span></div>
+      <div class="sthead"><span class="marker">1</span><h2>Load your holdings</h2><span class="chip" id="exampleChip">Example data</span></div>
       <p class="stdesc">Upload them in the format below or choose them one by one. Check the table before the committee sits: it only knows what is in it.</p>
 
       <div id="claudeBanner" class="banner" hidden></div>
 
       <div class="loadgrid">
         <div class="card">
+          <h3>Add your holdings</h3>
           <div class="tabs" role="tablist" aria-label="How to add holdings">
             <button role="tab" id="tabUpload" aria-selected="true" aria-controls="pUpload">Upload</button>
             <button role="tab" id="tabPick" aria-selected="false" aria-controls="pPick">Choose manually</button>
@@ -297,7 +322,7 @@ CASH,8</pre>
       </div>
 
       <div class="card" style="margin-top:18px">
-        <div class="row" style="justify-content:space-between">
+        <div class="cardhead">
           <h3>Holdings</h3>
           <div class="row"><button class="btn quiet" id="addRow">Add an empty line</button><button class="btn quiet" id="clearAll">Clear table</button></div>
         </div>
@@ -325,24 +350,21 @@ CASH,8</pre>
 
     <!-- 2 -->
     <section class="station" id="s2">
-      <span class="marker">2</span>
-      <div class="sthead"><h2>The committee proposes</h2><span class="chip" id="c2">Waiting</span></div>
+      <div class="sthead"><span class="marker">2</span><h2>The committee proposes</h2><span class="chip" id="c2">Waiting</span></div>
       <p class="stdesc">Each member argues from one lens only and proposes at most two ideas: their best buy and the weakest holding to sell, each sized in points of the portfolio.</p>
       <div class="members" id="members"></div>
     </section>
 
     <!-- 3 -->
     <section class="station" id="s3">
-      <span class="marker">3</span>
-      <div class="sthead"><h2>Members rate each other</h2><span class="chip" id="c3">Waiting</span></div>
+      <div class="sthead"><span class="marker">3</span><h2>Members rate each other</h2><span class="chip" id="c3">Waiting</span></div>
       <p class="stdesc">Every member scores the ideas they did not propose, from −5 (would damage the portfolio by their lens) to +5 (exactly what their lens wants). The spread is how much they disagree.</p>
       <div id="ratings"></div>
     </section>
 
     <!-- 4 -->
     <section class="station" id="s4">
-      <span class="marker">4</span>
-      <div class="sthead"><h2>The CIO rules</h2><span class="chip" id="c4">Waiting</span></div>
+      <div class="sthead"><span class="marker">4</span><h2>The CIO rules</h2><span class="chip" id="c4">Waiting</span></div>
       <p class="stdesc">The CIO approves at most three ideas. Then the house rules run: buys must be paid from cash or sales, no trade under the minimum, no company over your cap, no selling more than you hold. Each order gets a limit set from the line's usual daily move.</p>
       <div id="ruling"></div>
     </section>
