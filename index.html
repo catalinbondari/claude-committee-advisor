@@ -13,35 +13,35 @@ img { max-width: 100%; }
 <title>Claude Committee Advisor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Michroma&display=swap">
 <style>
-/* Layout: a financial newspaper's front page on plain off-white paper. Centred masthead over a double rule, a section nav
-   that sticks, the committee as the lead story (headline, standfirst, a graphic with a source
-   line), then each step as a section under a short black topic bar, separated by thin rules. */
+/* Layout: a quiet night-time committee room. One 3D ring of nine members around a gold CIO
+   anchors the page; few sections, generous space; gold only for the CIO and the decision. */
 :root {
-  --paper: #FBFAF8; --paper-2: #EEECE7; --card: #FFFFFF; --ink: #262A33; --ink-2: #3F4450; --muted: #646A75; --rule: #D3D0CA; --rule-2: #E8E6E1;
-  --teal: #0D7680; --claret: #B3261E; --oxford: #0F5499; --oxford-2: #0A3D73; --amber: #A35A00; --accent: #0F5499;
-  --teal-12: rgba(13,118,128,.12); --claret-12: rgba(179,38,30,.09); --oxford-12: rgba(15,84,153,.10); --amber-12: rgba(163,90,0,.10);
-  /* names the page script uses */
-  --fg: var(--ink); --sheet: var(--card); --buy: var(--teal); --sell: var(--claret); --warn: var(--amber); --cyan: var(--oxford); --lime: var(--teal);
-  --serif: "Newsreader", Georgia, "Times New Roman", serif;
-  --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --bg:#080A0F; --bg-2:#0C1017; --surface:#11161E; --surface-2:#161C26; --line:#222A36; --line-2:#2E3846;
+  --fg:#E8ECF2; --fg-2:#C3CAD5; --muted:#8890A0; --accent:#E7B04A; --accent-ink:#1A1206;
+  --buy:#3CC79B; --sell:#EF6E6E; --warn:#E7B04A; --glass:rgba(12,16,23,.72);
+  --member-1:#7FA6CF; --member-2:#C49A86; --member-3:#6FB0E0; --member-4:#9DBB80; --member-5:#D3829C;
+  --member-6:#97A6B4; --member-7:#A792D2; --member-8:#C9A174; --member-9:#E27D5F;
+  --display:"Michroma", "Eurostile", system-ui, sans-serif; --sans:"IBM Plex Sans", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; --serif:var(--display);
+  /* names the older rules still use, mapped onto the tokens above */
+  --paper:var(--bg); --paper-2:var(--bg-2); --card:var(--surface); --sheet:var(--surface); --ink:var(--fg); --ink-2:var(--fg-2);
+  --rule:var(--line-2); --rule-2:var(--line); --teal:var(--buy); --claret:var(--sell); --oxford:var(--accent); --oxford-2:var(--accent);
+  --amber:var(--accent); --cyan:var(--accent); --lime:var(--buy);
+  --teal-12:color-mix(in srgb, var(--buy) 14%, transparent); --claret-12:color-mix(in srgb, var(--sell) 14%, transparent);
+  --oxford-12:color-mix(in srgb, var(--accent) 14%, transparent); --amber-12:color-mix(in srgb, var(--accent) 14%, transparent);
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #1C2027; --paper-2: #171A20; --card: #242933; --ink: #ECEEF1; --ink-2: #D4D8DE; --muted: #A3AAB5; --rule: #4D4F57; --rule-2: #383C45;
-    --teal: #3FB3BD; --claret: #F2645B; --oxford: #6FA8E8; --oxford-2: #8DBBEF; --amber: #F0A64A; --accent: #6FA8E8;
-    --teal-12: rgba(63,179,189,.16); --claret-12: rgba(242,100,91,.14); --oxford-12: rgba(111,168,232,.16); --amber-12: rgba(240,166,74,.14);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #1C2027; --paper-2: #171A20; --card: #242933; --ink: #ECEEF1; --ink-2: #D4D8DE; --muted: #A3AAB5; --rule: #4D4F57; --rule-2: #383C45;
-  --teal: #3FB3BD; --claret: #F2645B; --oxford: #6FA8E8; --oxford-2: #8DBBEF; --amber: #F0A64A; --accent: #6FA8E8;
-  --teal-12: rgba(63,179,189,.16); --claret-12: rgba(242,100,91,.14); --oxford-12: rgba(111,168,232,.16); --amber-12: rgba(240,166,74,.14);
-  color-scheme: dark;
-}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg:#F4F5F8; --bg-2:#ECEEF2; --surface:#FFFFFF; --surface-2:#F7F8FA; --line:#DCE0E7; --line-2:#C9CFD9;
+  --fg:#0E121A; --fg-2:#2A303B; --muted:#5A6271; --accent:#A06A10; --accent-ink:#FFFFFF; --buy:#0E8A62; --sell:#C23B3B; --warn:#A06A10; --glass:rgba(244,245,248,.8);
+  color-scheme:light; } }
+:root[data-theme="light"] {
+  --bg:#F4F5F8; --bg-2:#ECEEF2; --surface:#FFFFFF; --surface-2:#F7F8FA; --line:#DCE0E7; --line-2:#C9CFD9;
+  --fg:#0E121A; --fg-2:#2A303B; --muted:#5A6271; --accent:#A06A10; --accent-ink:#FFFFFF; --buy:#0E8A62; --sell:#C23B3B; --warn:#A06A10; --glass:rgba(244,245,248,.8);
+  color-scheme:light; }
+:root[data-theme="dark"] { color-scheme:dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
@@ -281,7 +281,49 @@ table.orders td.why { white-space: normal; min-width: 240px; font: 400 15px/1.45
 .preview b { display: block; font: 700 15px/1.3 var(--sans); margin-bottom: 4px; }
 .preview span { font: 400 16px/1.45 var(--serif); color: var(--ink-2); }
 @media (max-width: 640px) { .preview { grid-template-columns: 1fr; gap: 14px; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* Night-room overrides: existing form and results markup deliberately share this lean skin. */
+:root { --bg:#090B10; --surface:#10141B; --line:#1F2632; --fg:#E9EDF3; --muted:#8B94A5; --accent:#E7B04A; --buy:#38C79A; --sell:#EF6B6B; --display:"Michroma",system-ui,sans-serif; --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace; color-scheme:dark; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg:#F5F6F8; --surface:#FFFFFF; --line:#DDE1E8; --fg:#10141B; --muted:#5B6474; --accent:#A9741A; --buy:#11875F; --sell:#C23B3B; color-scheme:light; } }
+:root[data-theme="light"] { --bg:#F5F6F8; --surface:#FFFFFF; --line:#DDE1E8; --fg:#10141B; --muted:#5B6474; --accent:#A9741A; --buy:#11875F; --sell:#C23B3B; color-scheme:light; }
+body { background:var(--bg); color:var(--fg); font-family:var(--sans); }
+body::before { content:""; position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle at 50% 0%,color-mix(in srgb,var(--surface) 70%,transparent),transparent 48rem); }
+a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
+.masthead,.navbar { background:color-mix(in srgb,var(--bg) 92%,transparent); border-color:var(--line); backdrop-filter:blur(14px); }
+.masthead-inner { padding-top:18px; }.centre-title,.hero-title,.section-head h2,.sthead h2 { font-family:var(--display); letter-spacing:var(--step); }.centre-title { font-size:clamp(1rem,3vw,1.5rem); color:var(--fg); }.centre-title strong,.lime { color:var(--accent); font-style:normal; }.strap,.dateline,.hero-sub,.stdesc,.empty-results p,.preview span { font-family:var(--sans); color:var(--muted); }.double-rule::before { border-color:var(--line); }
+.wrap { max-width:1200px; padding-inline:16px; }.hero { position:relative; display:block; min-height:min(70vh,640px); padding:0; border:1px solid var(--line); overflow:hidden; background:var(--surface); }.hero-copy { position:relative; z-index:2; max-width:700px; padding:clamp(28px,6vw,76px) 22px; pointer-events:none; }.hero-copy .hero-cta,.hero-copy a { pointer-events:auto; }.hero-title { font-size:clamp(1.8rem,4.5vw,3.4rem); line-height:1.25; }.hero-sub { max-width:52ch; font-size:clamp(1rem,2vw,1.15rem); }.hero-stats { max-width:520px; border-color:var(--line); }.hero-stats dd { font-family:var(--display); font-size:clamp(.8rem,1.5vw,1rem); color:var(--fg); }.ring { position:absolute; inset:0; z-index:1; margin:0; padding:0; border:0; }.ring .g-title,.ring .g-sub,.ring figcaption { position:absolute; z-index:3; left:22px; bottom:22px; border:0; color:var(--muted); }.ring .g-title { display:none; }.ring .g-sub { bottom:42px; max-width:28ch; }.ring svg { display:none; }.scene-canvas { width:100%; height:100%; display:block; }.scene-fallback { position:absolute; inset:20%; width:60%; height:60%; }.scene-fallback circle { fill:var(--surface); stroke:var(--line); }.scene-fallback .cio-fallback { fill:var(--accent); }.scene-fallback text { fill:var(--fg); font-family:var(--mono); font-size:10px; }.ring figcaption { font:12px/1.3 var(--mono); }
+.navbar { top:0; }.mapname,.card>h3,.cardhead,.rail h3,.preview b,.badge,.stamp { font-family:var(--mono); }.dot,.badge { border-radius:50%; background:var(--surface); border-color:var(--line); }.btn { border-radius:2px; border-color:var(--line); background:var(--surface); color:var(--fg); font-family:var(--mono); }.btn:hover:not(:disabled) { background:color-mix(in srgb,var(--surface) 80%,var(--fg)); }.btn.primary,#conveneBtn,#openClaude { background:var(--accent); color:var(--bg); border-color:var(--accent); }.chip { border-radius:999px; background:color-mix(in srgb,var(--surface) 85%,var(--line)); color:var(--muted); }.chip.run { background:var(--accent); color:var(--bg); }.chip.done,.act.buy { background:var(--buy); color:var(--bg); }.chip.fail,.act.sell { background:var(--sell); color:var(--fg); }
+.how,.station { margin-top:64px; }.section-head,.sthead { border-color:var(--line); }.section-head::before,.sthead::before { background:var(--accent); }.node { font-family:var(--display); color:var(--accent); font-size:22px; }.rail li,.facts-line { border-color:var(--line); }.loadgrid,.card,.members { gap:18px; }.card { background:var(--surface); border:1px solid var(--line); padding:18px; }.card>h3,.cardhead { border-color:var(--line); }.format pre,input[type=text],input[type=number],input[type=search],select,textarea { background:color-mix(in srgb,var(--surface) 88%,var(--bg)); color:var(--fg); border-color:var(--line); }.banner { background:color-mix(in srgb,var(--accent) 12%,var(--surface)); border-color:var(--accent); }.tablewrap { border:1px solid var(--line); } th,td,table.hold tfoot .sum td { border-color:var(--line); } tbody tr:hover { background:color-mix(in srgb,var(--surface) 75%,var(--fg)); }.member { background:var(--surface); border:1px solid var(--line); padding:14px; border-left:3px solid var(--member-1); }.member:nth-child(2){border-left-color:var(--member-2)}.member:nth-child(3){border-left-color:var(--member-3)}.member:nth-child(4){border-left-color:var(--member-4)}.member:nth-child(5){border-left-color:var(--member-5)}.member:nth-child(6){border-left-color:var(--member-6)}.member:nth-child(7){border-left-color:var(--member-7)}.member:nth-child(8){border-left-color:var(--member-8)}.member:nth-child(9){border-left-color:var(--member-9)}.members { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }.member .nm,.note { font-family:var(--sans); color:var(--fg); }.idea { border-color:var(--line); }.empty-results,.preview div,.verdict { border-color:var(--line); }.verdict { background:var(--surface); padding:22px; }.fine { border-color:var(--line); }
+.stage { display:grid; grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr); gap:18px; align-items:start; }.stage-scene { min-height:320px; position:sticky; top:70px; background:var(--surface); border:1px solid var(--line); }.stage-scene .ring { position:absolute; }.thinking-panel { min-height:320px; padding:24px; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); }.thinking-member { color:var(--accent); font-family:var(--mono); }.thinking-text { min-height:7em; white-space:pre-wrap; font-family:var(--mono); color:var(--fg); }.member-pills { display:flex; flex-wrap:wrap; gap:6px; margin:14px 0; }.member-pill { font:11px/1 var(--mono); border:1px solid var(--line); padding:6px; color:var(--muted); }.member-pill.thinking { border-color:var(--accent); color:var(--accent); }.member-pill.done { border-color:var(--buy); color:var(--buy); }.demo-controls { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }.demo-label { color:var(--accent); font:12px var(--mono); }
+.committee-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; }.profile-card { text-align:left; min-height:150px; padding:16px; color:var(--fg); background:var(--surface); border:1px solid var(--line); border-top:3px solid var(--member-1); cursor:pointer; }.profile-card:nth-child(2){border-top-color:var(--member-2)}.profile-card:nth-child(3){border-top-color:var(--member-3)}.profile-card:nth-child(4){border-top-color:var(--member-4)}.profile-card:nth-child(5){border-top-color:var(--member-5)}.profile-card:nth-child(6){border-top-color:var(--member-6)}.profile-card:nth-child(7){border-top-color:var(--member-7)}.profile-card:nth-child(8){border-top-color:var(--member-8)}.profile-card:nth-child(9){border-top-color:var(--member-9)}.profile-card:last-child{border-top-color:var(--accent)}.profile-card strong { display:block; font-family:var(--mono); margin-top:12px; }.profile-sheet { position:fixed; z-index:100; inset:0; display:grid; place-items:center; padding:16px; background:color-mix(in srgb,var(--bg) 85%,transparent); }.profile-sheet > div { width:min(640px,100%); max-height:calc(100vh - 32px); overflow:auto; padding:26px; background:var(--surface); border:1px solid var(--line); }.profile-sheet h2 { font-family:var(--display); font-size:1rem; }.profile-sheet li { margin:.5em 0; }.profile-sheet summary { color:var(--accent); }
+@media (max-width:640px) { .hero { min-height:560px; }.hero-copy { padding-top:32px; }.ring { opacity:.7; }.ring .g-sub { display:none; }.hero-stats { grid-template-columns:repeat(2,1fr); }.stage { grid-template-columns:1fr; }.stage-scene { position:relative; top:auto; min-height:240px; }.mapstate { display:none; }.profile-sheet { padding:8px; }.profile-sheet > div { max-height:calc(100vh - 16px); } }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
+@media (max-width: 760px) { .navbar { display: none; } }
+/* stage: one large scene; the working member speaks from its own circle */
+.stage { grid-template-columns: 1fr; }
+.stage-scene { position: relative; top: auto; height: min(74vh, 640px); min-height: 440px; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 40%, var(--surface-2), var(--bg) 70%); }
+.stage-bar { display: flex; justify-content: center; }
+.stage-bar .demo-controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage-scene .ring .g-sub, .stage-scene .ring figcaption, .stage-scene .ring .g-title { display: none; }
+.scene-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
+.s-label { position: absolute; left: 0; top: 0; text-align: center; white-space: nowrap; font: 500 11px/1.25 var(--mono);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--fg-2); text-shadow: 0 1px 8px var(--bg), 0 0 2px var(--bg);
+  transition: color .3s; will-change: transform; }
+.s-label small { display: block; font: 400 10px/1.3 var(--mono); letter-spacing: .02em; text-transform: none; color: var(--muted); }
+.s-label.on { color: var(--fg); }
+.s-label.on small, .s-label.cio small { color: var(--accent); }
+.s-label.cio { color: var(--accent); font-weight: 600; }
+.s-bubble { position: absolute; left: 0; top: 0; width: min(300px, 74%); padding: 10px 12px 11px; font: 400 13px/1.45 var(--sans); color: var(--fg);
+  background: var(--glass); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line-2);
+  border-left: 3px solid var(--bub, var(--accent)); border-radius: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.35);
+  opacity: 0; transition: opacity .35s ease; will-change: transform; }
+.s-bubble.on { opacity: 1; }
+.s-bubble b { display: block; margin-bottom: 4px; font: 600 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--bub, var(--accent)); }
+@media (min-width: 900px) { .hero .ring { left: 44%; } }
+@media (max-width: 899px) { .hero { display: flex; flex-direction: column; } .hero .ring { position: relative; inset: auto; height: 460px; order: 2; } }
+@media (max-width: 640px) { .stage-scene { height: 520px; } .s-label { font-size: 9.5px; } .s-label small { display: none; } .s-label.on small { display: block; } .s-bubble { font-size: 12px; width: 78%; } }
+
 </style>
 </head>
 <body>
@@ -290,7 +332,7 @@ table.orders td.why { white-space: normal; min-width: 240px; font: 400 15px/1.45
   <div class="masthead-inner">
     <div class="dateline"><span id="todayLine"></span><span>Personal research tool · not investment advice</span></div>
     <h1 class="centre-title">Claude Committee <strong>Advisor</strong></h1>
-    <div class="strap">Eight AI analysts propose and rate trades. A CIO rules. <b>You decide.</b></div>
+    <div class="strap">Nine specialists propose and rate trades. A CIO rules. <b>You decide.</b></div>
   </div>
   <div class="double-rule"></div>
 </header>
@@ -299,7 +341,7 @@ table.orders td.why { white-space: normal; min-width: 240px; font: 400 15px/1.45
   <div class="navbar-inner">
     <ol class="map" id="map">
       <li data-s="1"><a href="#s1"><span class="dot">1</span><span><span class="mapname">Holdings</span><span class="mapstate" id="m1">Example loaded</span></span></a></li>
-      <li data-s="2"><a href="#s2"><span class="dot">2</span><span><span class="mapname">Proposals</span><span class="mapstate" id="m2">8 members</span></span></a></li>
+      <li data-s="2"><a href="#s2"><span class="dot">2</span><span><span class="mapname">Proposals</span><span class="mapstate" id="m2">9 members</span></span></a></li>
       <li data-s="3"><a href="#s3"><span class="dot">3</span><span><span class="mapname">Peer ratings</span><span class="mapstate" id="m3">−5 to +5</span></span></a></li>
       <li data-s="4"><a href="#s4"><span class="dot">4</span><span><span class="mapname">CIO ruling</span><span class="mapstate" id="m4">Orders with limits</span></span></a></li>
     </ol>
@@ -309,25 +351,26 @@ table.orders td.why { white-space: normal; min-width: 240px; font: 400 15px/1.45
 <div class="wrap">
   <section class="hero" aria-labelledby="heroTitle">
     <div class="hero-copy">
-      <p class="eyebrow">AI investment committee</p>
-      <h2 class="hero-title" id="heroTitle">Eight analysts, one CIO and <span class="lime">your portfolio</span></h2>
-      <p class="hero-sub">Load what you own. Eight Claude analysts, each with one lens, propose trades and rate each other's ideas. A CIO rules, and every order comes with a new weight, a limit price and an expiry.</p>
+      <p class="eyebrow">Claude Committee Advisor</p>
+      <h2 class="hero-title" id="heroTitle">Nine analysts argue. One CIO decides.</h2>
+      <p class="hero-sub">Load a portfolio and watch each member think, propose and rate the others. The CIO turns it into orders with limit prices.</p>
       <div class="hero-cta">
-        <a class="btn primary big" href="#s1">Load your holdings</a>
-        <a class="btn big" href="#how">How it works</a>
+        <button class="btn primary big" id="playDemo">Play demo</button>
+        <a class="btn big" href="#s1">Use my portfolio</a>
       </div>
       <dl class="hero-stats">
-        <div><dt>Committee</dt><dd>8 + CIO</dd></div>
-        <div><dt>Claude calls</dt><dd>17</dd></div>
+        <div><dt>Committee</dt><dd>9 + CIO</dd></div>
+        <div><dt>Claude calls</dt><dd>19</dd></div>
         <div><dt>One sitting</dt><dd>3–6 min</dd></div>
         <div><dt>Runs on</dt><dd>your plan</dd></div>
       </dl>
     </div>
-    <figure class="ring" aria-label="The committee: eight members around the CIO">
+    <figure class="ring" aria-label="The committee: nine members around the CIO">
       <div class="g-title">The committee</div>
       <div class="g-sub">Each member proposes and rates; the CIO rules. Lights up live during a sitting.</div>
-      <svg id="ringSvg" viewBox="0 0 420 420" role="img"></svg>
-      <figcaption id="ringCaption">Committee idle · 8 members + CIO</figcaption>
+      <canvas class="scene-canvas" id="sceneCanvas" aria-label="Animated committee ring"></canvas>
+      <svg class="scene-fallback" id="ringSvg" viewBox="0 0 420 420" role="img"></svg>
+      <figcaption id="ringCaption">Committee idle · 9 members + CIO</figcaption>
     </figure>
   </section>
 
@@ -335,7 +378,7 @@ table.orders td.why { white-space: normal; min-width: 240px; font: 400 15px/1.45
     <div class="section-head"><h2 id="howTitle">How it works</h2></div>
     <ol class="rail">
       <li><span class="node">1</span><h3>Load</h3><p>Upload ISINs and weights, or pick holdings from a list. Set your risk, horizon and a cap on any one company.</p></li>
-      <li><span class="node">2</span><h3>Propose</h3><p>Eight members (data, news, US tech, income, growth, research, goals, tax) each propose a buy and a sell.</p></li>
+      <li><span class="node">2</span><h3>Members propose</h3><p>Nine members, including a disaster sceptic, each propose from one distinct lens.</p></li>
       <li><span class="node">3</span><h3>Rate</h3><p>Each scores the others' ideas from −5 to +5. A wide spread marks a contested idea.</p></li>
       <li><span class="node">4</span><h3>Rule</h3><p>The CIO approves up to three. House rules check the money adds up, then each order gets a limit and an expiry.</p></li>
     </ol>
@@ -380,6 +423,8 @@ CASH,8</pre>
             </div>
             <div class="row">
               <label class="btn primary filebtn" id="fileLbl">Upload CSV<input type="file" id="file" accept=".csv,.txt,.tsv,image/png,image/jpeg,image/webp"></label>
+              <button class="btn quiet" id="loadSample">Load the sample portfolio</button>
+              <a class="btn quiet" href="https://github.com/catalinbondari/claude-committee-advisor/blob/main/samples/sample-portfolio.csv" target="_blank" rel="noopener">Get the sample CSV</a>
               <button class="btn quiet" id="copyTpl">Copy the template</button>
             </div>
             <details id="pasteBox">
@@ -446,6 +491,23 @@ CASH,8</pre>
       </div>
     </section>
 
+    <section class="station" id="stage" hidden aria-labelledby="stageTitle">
+      <div class="sthead"><span class="marker">2</span><h2 id="stageTitle">The sitting</h2><span class="chip" id="stageState">Waiting</span></div>
+      <p class="demo-label" id="demoLabel" hidden>Demo — scripted example, not advice</p>
+      <div class="stage">
+        <div class="stage-scene" id="stageScene"></div>
+        <div class="stage-bar">
+          <div class="sr" id="thinkingMember">The committee is ready</div>
+          <p class="sr" id="thinkingText" aria-live="polite">A member's live reasoning will appear here.</p>
+          <div class="member-pills" id="memberPills" hidden></div>
+          <div class="demo-controls" id="demoControls" hidden>
+            <button class="btn" id="demoPause">Pause</button><button class="btn" id="demoNext">Next step</button>
+            <button class="btn" id="demoSpeed">1×</button><button class="btn" id="demoExit">Exit demo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="station" id="resultsEmpty">
       <div class="sthead"><span class="marker">2</span><h2>The sitting</h2><span class="chip">Waiting</span></div>
       <div class="empty-results">
@@ -480,9 +542,16 @@ CASH,8</pre>
     </section>
   </div>
 
-  <p class="fine" style="margin-top:26px">The committee recommends; you decide. This is not regulated financial advice. Claude cannot browse, so a name or price it fills in comes from memory and is marked; check the ISIN and the live price before you place an order. Your holdings and the last sitting are kept in this browser only. An independent tool that runs on Claude; not made or endorsed by Anthropic.</p>
+  <section class="station" id="committee" aria-labelledby="committeeTitle">
+    <div class="sthead"><span class="marker">3</span><h2 id="committeeTitle">The committee</h2></div>
+    <p class="stdesc">Nine independent lenses; one accountable ruling.</p>
+    <div class="committee-grid" id="committeeGrid"></div>
+  </section>
+
+  <footer class="fine" style="margin-top:26px"><a href="https://github.com/catalinbondari/claude-committee-advisor" target="_blank" rel="noopener">GitHub repository</a> · Runs on your own Claude account · It recommends; you decide.</footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 "use strict";
 const KEY = "committee-room:v2";
@@ -566,19 +635,21 @@ const MEMBERS = [
     brief: "You are the Goal Keeper. Money with a date must be there on the date. You guard the investor's horizon, concentration in single lines, beta and drawdown. Nothing that can halve belongs in money needed within three years." },
   { id: "taxcost", name: "The Tax & Cost Officer", mark: "Tx", lens: "Tax on gains, funds vs shares, trading cost",
     brief: "You are the Tax & Cost Officer. You count returns after tax and commission: how shares and funds are taxed differently, annual exemptions, loss relief, fund fees and trading costs. You dislike churn and realising big gains. The investor's tax country is not given: say which rules you assumed." },
+  { id: "stress", name: "The Stress Tester", mark: "St", lens: "Worst cases: crashes, drawdowns, what breaks first",
+    brief: "You are the Stress Tester. You assume the bad day comes. For every idea, ask what it does in a 2008-style crash (-50% equities), a 2022-style rate shock (bonds and growth fall together) and a single-name collapse (-80%). You favour ideas that cut the portfolio's worst-case loss and you mark down anything that adds a hidden way to lose a lot. You are the most cautious member." },
 ];
 const NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name]));
 
 const EXAMPLE = {
-  example: true, risk: "balanced", horizon: "3-10 years", maxSingle: 10, cash: 8, value: 25000, ids: {},
+  example: true, risk: "balanced", horizon: "3-10 years", maxSingle: 10, cash: 6, value: 25000, ids: {},
   holdings: [
-    { isin: "IE00BK5BQT80", name: "", type: "", weight: 40, price: 138.5 },
+    { isin: "IE00BK5BQT80", name: "", type: "", weight: 25, price: 138.5 },
     { isin: "IE00B5BMR087", name: "", type: "", weight: 20, price: null },
     { isin: "IE00BKM4GZ66", name: "", type: "", weight: 8, price: null },
-    { isin: "NL0010273215", name: "", type: "", weight: 6, price: null },
-    { isin: "US67066G1040", name: "", type: "", weight: 8, price: null },
-    { isin: "US88160R1014", name: "", type: "", weight: 4, price: null },
-    { isin: "IE00B4ND3602", name: "", type: "", weight: 6, price: null },
+    { isin: "IE00B4WXJJ64", name: "", type: "", weight: 8, price: null },
+    { isin: "US0378331005", name: "", type: "", weight: 14, price: null },
+    { isin: "US67066G1040", name: "", type: "", weight: 10, price: null },
+    { isin: "NL0010273215", name: "", type: "", weight: 9, price: null },
   ],
 };
 
@@ -588,6 +659,8 @@ let sample = null, imagesOK = false, claudeReady = false;
 let running = false, halt = null;
 const live = new Set();
 let timerId = null;
+let scene = null;   // the 3D committee; declared early because render() reaches it
+let streamed = {};
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -835,7 +908,7 @@ function snapshot() {
   };
 }
 function evidenceText(snap) {
-  return `You sit on a private eight-member investment committee for one investor's portfolio; a CIO rules on your ideas.
+  return `You sit on a private nine-member investment committee for one investor's portfolio; a CIO rules on your ideas.
 Argue from your own lens only - the other members cover the other views. Use the investor's data below and well-established public knowledge.
 You cannot browse and your knowledge has a cutoff, so treat any price or figure from memory as possibly stale and say so. Never invent the investor's numbers.
 The investor makes the final decision; you recommend. Today is ${snap.date}. The base currency is the euro.
@@ -868,10 +941,10 @@ Write a 2-3 sentence note to the investor in plain words.
 Reply with only JSON: {"decision":"approve|amend|reject","note":"","approved":[{"ideaId":"","sizePct":0,"why":""}],"rejected":[{"ideaId":"","why":""}]}`;
 
 /* ---------- running the sitting ---------- */
-async function ask(prompt, opts) {
+async function ask(prompt, opts, speaker) {
   const ctl = new AbortController();
   live.add(ctl);
-  try { return await sample.json(prompt, { ...opts, signal: ctl.signal }); }
+  try { return await sample.json(prompt, { ...opts, signal: ctl.signal, onText: text => { if (speaker) { streamed[speaker] = String(text || ""); render(); } } }); }
   finally { live.delete(ctl); }
 }
 function stopAll(reason) { if (!halt) halt = reason; for (const c of live) c.abort(); }
@@ -941,7 +1014,7 @@ async function convene() {
   await identify();
   const snap = snapshot();
   if (!snap.holdings.length && !snap.cashPct) { running = false; setConvene(); return; }
-  sitting = { at: new Date().toISOString(), snap, phase: "propose", status: {}, proposals: {}, pooled: [], ratings: {}, rstatus: {}, ranked: [], cio: null, orders: [], stopped: [], error: null, example: state.example };
+  streamed = {}; sitting = { at: new Date().toISOString(), snap, phase: "propose", status: {}, proposals: {}, pooled: [], ratings: {}, rstatus: {}, ranked: [], cio: null, orders: [], stopped: [], error: null, example: state.example };
   startTimer(); render();
   $("s2").scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -949,7 +1022,7 @@ async function convene() {
   await runPool(MEMBERS.map(m => async () => {
     sitting.status[m.id] = "thinking"; render();
     try {
-      const out = await ask(`${m.brief}\n\n${base}\n\n${PROPOSE(snap)}`, { modelTier: "default" });
+      const out = await ask(`${m.brief}\n\n${base}\n\n${PROPOSE(snap)}`, { modelTier: "default" }, m.id);
       sitting.proposals[m.id] = cleanIdeas(out, snap);
       sitting.status[m.id] = "done";
     } catch (e) { failMember(sitting.status, m.id, e); }
@@ -967,7 +1040,7 @@ async function convene() {
     sitting.rstatus[m.id] = "thinking"; render();
     const list = theirs.map(p => ({ ideaId: p.id, proposer: p.authors.map(a => NAME[a]).join(" + "), action: p.action, isin: p.isin, name: p.name, type: p.type, sizePct: p.sizePct, thesis: p.thesis, evidence: p.evidence }));
     try {
-      const out = await ask(`${m.brief}\n\n${base}\n\n## Ideas to rate\n${JSON.stringify(list)}\n\n${RATE}\n\nReply with only JSON: {"ratings":{"<ideaId>":{"score":0,"why":""}}} covering every idea listed.`, { modelTier: "default" });
+      const out = await ask(`${m.brief}\n\n${base}\n\n## Ideas to rate\n${JSON.stringify(list)}\n\n${RATE}\n\nReply with only JSON: {"ratings":{"<ideaId>":{"score":0,"why":""}}} covering every idea listed.`, { modelTier: "default" }, m.id);
       const r = (out && out.ratings) || {};
       sitting.ratings[m.id] = {};
       for (const p of theirs) {
@@ -989,7 +1062,7 @@ async function convene() {
       scores: Object.fromEntries(MEMBERS.filter(m => sitting.ratings[m.id] && sitting.ratings[m.id][p.id]).map(m => [NAME[m.id], sitting.ratings[m.id][p.id]])) };
   });
   try {
-    const out = await ask(`${CIO(snap)}\n\n${base}\n\n## The ranked ideas\n${JSON.stringify(table)}`, { modelTier: "complex" });
+    const out = await ask(`${CIO(snap)}\n\n${base}\n\n## The ranked ideas\n${JSON.stringify(table)}`, { modelTier: "complex" }, "cio");
     sitting.cio = {
       decision: ["approve", "amend", "reject"].includes(out && out.decision) ? out.decision : "amend",
       note: String((out && out.note) || "").slice(0, 900),
@@ -1098,6 +1171,7 @@ function setConvene() {
 function render() {
   setConvene();
   renderRing();
+  updateStage();
   const shown = !!sitting;
   $("resultsEmpty").hidden = shown;
   for (const id of ["s2", "s3", "s4"]) $(id).hidden = !shown;
@@ -1105,15 +1179,15 @@ function render() {
   setStation("s1", s ? "done" : null); setMap(1, s ? "done" : null);
   const proposed = s ? MEMBERS.filter(m => s.status[m.id] === "done").length : 0;
   const ideaCount = s ? Object.values(s.proposals).reduce((n, a) => n + a.length, 0) : 0;
-  if (!s) { setChip("c2", "", "Waiting"); setStation("s2"); setMap(2, null, "8 members"); }
-  else if (ph === "propose") { setChip("c2", "run", `${proposed} of 8 in`); setStation("s2", "run"); setMap(2, "run", `${proposed} of 8 in`); }
-  else { setChip("c2", proposed ? "done" : "fail", `${proposed} of 8 · ${ideaCount} ideas`); setStation("s2", proposed ? "done" : "fail"); setMap(2, proposed ? "done" : "fail", `${ideaCount} ideas`); }
+  if (!s) { setChip("c2", "", "Waiting"); setStation("s2"); setMap(2, null, "9 members"); }
+  else if (ph === "propose") { setChip("c2", "run", `${proposed} of 9 in`); setStation("s2", "run"); setMap(2, "run", `${proposed} of 9 in`); }
+  else { setChip("c2", proposed ? "done" : "fail", `${proposed} of 9 · ${ideaCount} ideas`); setStation("s2", proposed ? "done" : "fail"); setMap(2, proposed ? "done" : "fail", `${ideaCount} ideas`); }
   renderMembers();
   const rated = s ? MEMBERS.filter(m => s.rstatus[m.id] === "done").length : 0;
   if (!s || ph === "propose") { setChip("c3", "", "Waiting"); setStation("s3"); setMap(3, null, "−5 to +5"); }
-  else if (ph === "rate") { setChip("c3", "run", `${rated} of 8 in`); setStation("s3", "run"); setMap(3, "run", `${rated} of 8 in`); }
+  else if (ph === "rate") { setChip("c3", "run", `${rated} of 9 in`); setStation("s3", "run"); setMap(3, "run", `${rated} of 9 in`); }
   else if (!s.pooled.length) { setChip("c3", "", "Nothing to rate"); setStation("s3"); setMap(3, null, "Nothing to rate"); }
-  else { setChip("c3", rated ? "done" : "fail", `${rated} of 8 rated`); setStation("s3", rated ? "done" : "fail"); setMap(3, rated ? "done" : "fail", `${s.pooled.length} ideas rated`); }
+  else { setChip("c3", rated ? "done" : "fail", `${rated} of 9 rated`); setStation("s3", rated ? "done" : "fail"); setMap(3, rated ? "done" : "fail", `${s.pooled.length} ideas rated`); }
   renderRatings();
   if (!s || ph === "propose" || ph === "rate") { setChip("c4", "", "Waiting"); setStation("s4"); setMap(4, null, "Orders with limits"); }
   else if (ph === "cio") { setChip("c4", "run", "Ruling"); setStation("s4", "run"); setMap(4, "run", "Ruling…"); }
@@ -1293,7 +1367,7 @@ function renderRing() {
   const cio = $("rn-cio");
   if (cio) cio.setAttribute("class", "r-cio " + (!s ? "" : s.phase === "cio" ? "run" : s.phase === "done" ? "done" : ""));
   const cap = $("ringCaption");
-  if (cap) cap.textContent = !s ? "Committee idle · 8 members + CIO"
+  if (cap) cap.textContent = !s ? "Committee idle · 9 members + CIO"
     : { propose: "Proposals in progress", rate: "Peer ratings in progress", cio: "The CIO is ruling", done: "Sitting complete · see the orders below", stopped: "Sitting stopped" }[s.phase] || "";
 }
 
@@ -1377,6 +1451,332 @@ buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render();
   setConvene();
   identify();
 })();
+
+/* ---------- room scene, profiles and offline demo ---------- */
+const SAMPLE_CSV = `isin,weight,price
+IE00BK5BQT80,25,138.50
+IE00B5BMR087,20
+IE00BKM4GZ66,8
+IE00B4WXJJ64,8
+US0378331005,14
+US67066G1040,10
+NL0010273215,9
+CASH,6`;
+let demo = null, demoTick = null;
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function hex(name) { return new THREE.Color(css(name)); }
+/* ---------- the 3D committee ----------
+   Nine members on a tilted ring around the CIO. While a member works, a stream of light runs from it
+   to the centre; pooled ideas orbit the CIO as motes (teal buy, red sell); the rating round draws
+   arcs between members coloured by score; the CIO round dims the ring, the centre brightens and
+   sends out pulses, and the approved ideas settle into it. */
+const HUES = ["--member-1","--member-2","--member-3","--member-4","--member-5","--member-6","--member-7","--member-8","--member-9"];
+function glowTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(.18, "rgba(255,255,255,.55)");
+  r.addColorStop(.45, "rgba(255,255,255,.12)"); r.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+function initScene() {
+  const canvas = $("sceneCanvas"); if (!canvas || !window.THREE) return fallbackScene();
+  try {
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    const world = new THREE.Scene(), camera = new THREE.PerspectiveCamera(38, 1, .1, 200);
+    camera.position.set(0, -10.5, 14.5); camera.lookAt(0, 0, 0);
+    const glow = glowTexture();
+    const sprite = (color, size, opacity) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.set(size, size, 1); return s; };
+    const tilt = new THREE.Group(), group = new THREE.Group(); tilt.add(group); world.add(tilt);
+
+    // dust: a faint field of points around the room
+    const dustN = 700, dustPos = new Float32Array(dustN * 3);
+    for (let i = 0; i < dustN; i++) { const r = 9 + Math.random() * 26, a = Math.random() * Math.PI * 2, z = (Math.random() - .5) * 18; dustPos.set([Math.cos(a) * r, Math.sin(a) * r, z], i * 3); }
+    const dustGeo = new THREE.BufferGeometry(); dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+    const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: hex("--muted"), size: .06, transparent: true, opacity: .55, depthWrite: false }));
+    world.add(dust);
+
+    // the table: a thin ring and a dotted outer ring
+    const R = 6.2;
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, .012, 6, 160), new THREE.MeshBasicMaterial({ color: hex("--line-2"), transparent: true, opacity: .9 }));
+    group.add(ring);
+    const dotN = 120, dotPos = new Float32Array(dotN * 3);
+    for (let i = 0; i < dotN; i++) { const a = i / dotN * Math.PI * 2; dotPos.set([Math.cos(a) * (R + .9), Math.sin(a) * (R + .9), 0], i * 3); }
+    const dotGeo = new THREE.BufferGeometry(); dotGeo.setAttribute("position", new THREE.BufferAttribute(dotPos, 3));
+    const dots = new THREE.Points(dotGeo, new THREE.PointsMaterial({ color: hex("--line-2"), size: .05, transparent: true, opacity: .8 }));
+    group.add(dots);
+
+    // members
+    const nodes = {};
+    MEMBERS.forEach((m, i) => {
+      const a = i / MEMBERS.length * Math.PI * 2 + Math.PI / 2, col = hex(HUES[i % HUES.length]);
+      const core = new THREE.Mesh(new THREE.SphereGeometry(.36, 24, 18), new THREE.MeshBasicMaterial({ color: col }));
+      core.position.set(Math.cos(a) * R, Math.sin(a) * R, 0);
+      const halo = sprite(col, 2.4, .5); core.add(halo);
+      const orbit = new THREE.Mesh(new THREE.TorusGeometry(.7, .014, 6, 64), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0 }));
+      core.add(orbit);
+      core.userData = { ...m, halo, orbit, hue: HUES[i % HUES.length], heat: 0 };
+      group.add(core); nodes[m.id] = core;
+    });
+
+    // the CIO: a solid core inside a slowly turning wire shell
+    const cio = new THREE.Group();
+    const cioCore = new THREE.Mesh(new THREE.IcosahedronGeometry(.85, 0), new THREE.MeshBasicMaterial({ color: hex("--accent") }));
+    const cioShell = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.45, 1)), new THREE.LineBasicMaterial({ color: hex("--accent"), transparent: true, opacity: .45 }));
+    const cioGlow = sprite(hex("--accent"), 6, .45);
+    cio.add(cioCore, cioShell, cioGlow); group.add(cio);
+
+    // pulses from the CIO
+    const pulses = [0, 1, 2].map(k => { const p = new THREE.Mesh(new THREE.TorusGeometry(1, .02, 6, 96), new THREE.MeshBasicMaterial({ color: hex("--accent"), transparent: true, opacity: 0 })); p.userData.k = k; group.add(p); return p; });
+
+    // the thinking stream: particles from the working member to the centre
+    const streamN = 90, streamPos = new Float32Array(streamN * 3), streamOff = Float32Array.from({ length: streamN }, () => Math.random());
+    const streamGeo = new THREE.BufferGeometry(); streamGeo.setAttribute("position", new THREE.BufferAttribute(streamPos, 3));
+    const stream = new THREE.Points(streamGeo, new THREE.PointsMaterial({ map: glow, color: hex("--accent"), size: .32, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    group.add(stream);
+
+    // idea motes around the CIO
+    const motes = new THREE.Group(); group.add(motes);
+    const arcGroup = new THREE.Group(); group.add(arcGroup);
+
+    const ray = new THREE.Raycaster(), pointer = new THREE.Vector2(), look = new THREE.Vector2();
+    const hit = () => { ray.setFromCamera(pointer, camera); return ray.intersectObjects(Object.values(nodes), false)[0]; };
+    canvas.addEventListener("pointermove", e => {
+      const r = canvas.getBoundingClientRect();
+      pointer.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      look.copy(pointer);
+      const h = hit(); canvas.style.cursor = h ? "pointer" : ""; canvas.title = h ? `${h.object.userData.name}: ${h.object.userData.lens}` : "";
+    });
+    canvas.addEventListener("pointerleave", () => look.set(0, 0));
+    canvas.addEventListener("click", () => { const h = hit(); if (h) openProfile(h.object.userData.id); });
+
+    const holder = canvas.parentElement, labels = h("div", { class: "scene-labels", "aria-hidden": "true" });
+    MEMBERS.forEach(m => { const l = h("div", { class: "s-label" }, m.name.replace(/^The /, ""), h("small", {}, "")); labels.append(l); nodes[m.id].userData.label = l; });
+    const cioLabel = h("div", { class: "s-label cio" }, "CIO", h("small", {}, "")), bubble = h("div", { class: "s-bubble" }, h("b", {}, ""), h("span", {}, ""));
+    labels.append(cioLabel, bubble); holder.append(labels);
+    scene = { labels, cioLabel, bubble, renderer, world, camera, tilt, group, ring, dots, dust, nodes, cio, cioCore, cioShell, cioGlow, pulses, stream, streamOff, motes, arcGroup, look,
+      active: true, visible: true, last: 0, moteKey: "", from: null, cioHeat: 0,
+      reduce: matchMedia("(prefers-reduced-motion: reduce)").matches };
+    const resize = () => { const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; const asp = r.width / r.height; camera.position.z = asp < 1 ? 21 : asp > 1.5 ? 17.5 : 16.5; camera.updateProjectionMatrix(); camera.lookAt(0, -.9, 0); };
+    new ResizeObserver(resize).observe(canvas); resize();
+    new IntersectionObserver(x => { scene.visible = x[0].isIntersecting; }, { threshold: .01 }).observe(canvas);
+    document.addEventListener("visibilitychange", () => { scene.active = !document.hidden; });
+    new MutationObserver(refreshSceneTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    matchMedia("(prefers-color-scheme: light)").addEventListener("change", refreshSceneTheme);
+    requestAnimationFrame(drawScene);
+  } catch (e) { scene = null; fallbackScene(); }
+}
+function refreshSceneTheme() {
+  if (!scene) return;
+  const gold = hex("--accent");
+  scene.ring.material.color.set(hex("--line-2")); scene.dots.material.color.set(hex("--line-2")); scene.dust.material.color.set(hex("--muted"));
+  [scene.cioCore, scene.cioShell, scene.cioGlow].forEach(o => o.material.color.set(gold));
+  scene.pulses.forEach(p => p.material.color.set(gold));
+  MEMBERS.forEach(m => { const n = scene.nodes[m.id], c = hex(n.userData.hue); n.material.color.set(c); n.userData.halo.material.color.set(c); n.userData.orbit.material.color.set(c); });
+  scene.moteKey = "";
+}
+// Which member is working right now, by phase.
+function workingMember() {
+  if (!sitting) return null;
+  const st = sitting.phase === "rate" ? sitting.rstatus : sitting.phase === "propose" ? sitting.status : null;
+  return st ? MEMBERS.find(m => st[m.id] === "thinking") || null : null;
+}
+function syncMotes() {
+  const ideas = (sitting && sitting.pooled) || [];
+  const approved = new Set(((sitting && sitting.cio && sitting.cio.approved) || []).map(a => a.ideaId));
+  const key = ideas.map(i => i.id).join("|") + "#" + [...approved].join("|") + "#" + (sitting ? sitting.phase : "");
+  if (key === scene.moteKey) return; scene.moteKey = key;
+  scene.motes.clear();
+  ideas.forEach((idea, i) => {
+    const col = hex(idea.action === "buy" ? "--buy" : "--sell");
+    const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: scene.cioGlow.material.map, color: col, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false }));
+    m.scale.set(.75, .75, 1);
+    m.userData = { a: i / Math.max(1, ideas.length) * Math.PI * 2, r: 2.6, target: 2.6, fade: 1,
+      decided: sitting.phase === "done" ? (approved.has(idea.id) ? "in" : "out") : null };
+    if (m.userData.decided === "in") m.userData.target = .2;
+    if (m.userData.decided === "out") m.userData.target = 3.6;
+    scene.motes.add(m);
+  });
+}
+function drawScene(t) {
+  requestAnimationFrame(drawScene);
+  if (!scene || !scene.active || !scene.visible) return;
+  const dt = Math.min(.05, (t - (scene.last || t)) / 1000); scene.last = t;
+  const move = scene.reduce ? 0 : 1, ph = sitting && sitting.phase, time = t / 1000;
+  const working = workingMember(), cioOn = ph === "cio" || ph === "done";
+
+  // gentle rotation and a little parallax toward the pointer
+  scene.group.rotation.z += dt * .045 * move;
+  scene.tilt.rotation.x += ((scene.look.y * .12) - scene.tilt.rotation.x) * .05 * move;
+  scene.tilt.rotation.y += ((scene.look.x * .18) - scene.tilt.rotation.y) * .05 * move;
+  scene.dust.rotation.z -= dt * .01 * move;
+
+  // members: the working one swells, glows and spins its orbit; others dim while the CIO rules
+  MEMBERS.forEach(m => {
+    const n = scene.nodes[m.id], u = n.userData, on = working && working.id === m.id;
+    const st = sitting && (ph === "rate" ? sitting.rstatus[m.id] : sitting.status[m.id]);
+    u.heat += ((on ? 1 : 0) - u.heat) * .08;
+    const done = st === "done", dim = cioOn ? .35 : 1;
+    n.scale.setScalar(1 + u.heat * (.95 + .1 * Math.sin(time * 6) * move));
+    u.halo.material.opacity = (.32 + u.heat * .6 + (done ? .12 : 0)) * dim;
+    u.orbit.material.opacity = u.heat * .9; u.orbit.rotation.x = time * 1.4 * move; u.orbit.rotation.y = time * .9 * move;
+    n.material.opacity = dim; n.material.transparent = dim < 1;
+  });
+
+  // the stream from the working member to the CIO
+  const st = scene.stream;
+  if (working) {
+    const from = scene.nodes[working.id].position, mid = from.clone().multiplyScalar(.5); mid.z = 2.6;
+    const curve = new THREE.QuadraticBezierCurve3(from, mid, new THREE.Vector3(0, 0, 0)), pos = st.geometry.attributes.position;
+    for (let i = 0; i < scene.streamOff.length; i++) { const k = (scene.streamOff[i] + time * .45 * (move || 0)) % 1, p = curve.getPoint(k); pos.setXYZ(i, p.x, p.y, p.z); }
+    pos.needsUpdate = true;
+    st.material.color.copy(hex(scene.nodes[working.id].userData.hue));
+    st.material.opacity += (.85 - st.material.opacity) * .1;
+  } else st.material.opacity += (0 - st.material.opacity) * .1;
+
+  // the CIO
+  scene.cioHeat += ((cioOn ? 1 : 0) - scene.cioHeat) * .05;
+  scene.cioShell.rotation.x += dt * (.2 + scene.cioHeat * .9) * move; scene.cioShell.rotation.y += dt * (.3 + scene.cioHeat * 1.2) * move;
+  scene.cioCore.rotation.z -= dt * .4 * move;
+  scene.cio.scale.setScalar(1 + scene.cioHeat * (.35 + .05 * Math.sin(time * 3) * move));
+  scene.cioGlow.material.opacity = .4 + scene.cioHeat * .5;
+  scene.pulses.forEach(p => {
+    const k = ((time * .55 + p.userData.k / 3) % 1);
+    p.scale.setScalar(1.3 + k * 6); p.material.opacity = ph === "cio" && move ? (1 - k) * .5 : 0;
+  });
+
+  // idea motes: orbit the CIO, and on the ruling the approved ones fall in, the rest drift away
+  syncMotes();
+  scene.motes.children.forEach((m, i) => {
+    const u = m.userData; u.a += dt * (.35 + (cioOn ? .4 : 0)) * move; u.r += (u.target - u.r) * .03;
+    if (u.decided === "out") u.fade += (0 - u.fade) * .03;
+    m.position.set(Math.cos(u.a) * u.r, Math.sin(u.a) * u.r, Math.sin(u.a * 2 + i) * .35);
+    m.material.opacity = .9 * u.fade;
+  });
+  scene.arcGroup.children.forEach(l => { const u = l.userData; u.k = Math.min(1, u.k + dt * 1.2); l.geometry.setDrawRange(0, Math.ceil(u.k * u.n)); });
+  updateLabels(working, ph);
+  scene.renderer.render(scene.world, scene.camera);
+}
+// Names under every circle, a state line, and a speech bubble from whoever is working.
+const STATE_WORD = { idle: "", waiting: "waiting", thinking: "thinking…", done: "done", failed: "no answer" };
+function updateLabels(working, ph) {
+  const cv = scene.renderer.domElement, w = cv.clientWidth, hgt = cv.clientHeight; if (!w || !hgt) return;
+  const v = new THREE.Vector3(), at = obj => { obj.getWorldPosition(v); v.project(scene.camera); return [(v.x + 1) / 2 * w, (1 - v.y) / 2 * hgt]; };
+  let anchor = null;
+  MEMBERS.forEach(m => {
+    const n = scene.nodes[m.id], l = n.userData.label, [x, y] = at(n), on = working && working.id === m.id;
+    const st = sitting ? (ph === "rate" ? sitting.rstatus[m.id] : ph === "propose" ? sitting.status[m.id] : "") : "";
+    const word = on ? (ph === "rate" ? "rating ideas…" : "proposing…") : ph === "propose" && st === "done" ? ((sitting.proposals[m.id] || []).length ? `${sitting.proposals[m.id].length} idea${sitting.proposals[m.id].length > 1 ? "s" : ""}` : "no trade") : STATE_WORD[st] || "";
+    if (l.lastChild.textContent !== word) l.lastChild.textContent = word;
+    l.classList.toggle("on", !!on);
+    l.style.transform = `translate(${x.toFixed(1)}px, ${(y + 14 + n.scale.x * 9).toFixed(1)}px) translateX(-50%)`;
+    if (on) anchor = { x, y: y - 16 - n.scale.x * 10, hue: n.userData.hue, title: `${m.name} · ${ph === "rate" ? "rating" : "proposing"}` };
+  });
+  const [cx, cy] = at(scene.cio), cioWord = ph === "cio" ? "ruling…" : ph === "done" ? (sitting.cio ? sitting.cio.decision : "") : "";
+  scene.cioLabel.style.transform = `translate(${cx.toFixed(1)}px, ${(cy + 26 + scene.cio.scale.x * 14).toFixed(1)}px) translateX(-50%)`;
+  if (scene.cioLabel.lastChild.textContent !== cioWord) scene.cioLabel.lastChild.textContent = cioWord;
+  if (!anchor && ph === "cio") anchor = { x: cx, y: cy - 34 - scene.cio.scale.x * 14, hue: "--accent", title: "The CIO · deciding" };
+  const b = scene.bubble;
+  if (anchor) {
+    let text = ($("thinkingText") && $("thinkingText").textContent) || "";
+    if (text.length > 200) text = "…" + text.slice(-200);
+    if (b.lastChild.textContent !== text) b.lastChild.textContent = text;
+    if (b.firstChild.textContent !== anchor.title) b.firstChild.textContent = anchor.title;
+    b.style.setProperty("--bub", `var(${anchor.hue})`);
+    const bw = b.offsetWidth, bh = b.offsetHeight;
+    const bx = Math.max(8, Math.min(w - bw - 8, anchor.x - bw / 2)), by = Math.max(8, Math.min(hgt - bh - 8, anchor.y - bh));
+    b.style.transform = `translate(${bx.toFixed(1)}px, ${by.toFixed(1)}px)`;
+  }
+  b.classList.toggle("on", !!anchor);
+}
+function updateArcs() {
+  if (!scene) return;
+  const key = sitting && sitting.phase === "rate" ? JSON.stringify(Object.keys(sitting.ratings).map(k => [k, Object.keys(sitting.ratings[k] || {}).length])) : "";
+  if (key === scene.arcKey) return; scene.arcKey = key;
+  const keep = new Map(scene.arcGroup.children.map(l => [l.userData.id, l]));
+  scene.arcGroup.clear();
+  if (!key) return;
+  MEMBERS.forEach(m => Object.entries(sitting.ratings[m.id] || {}).forEach(([id, r]) => {
+    const p = sitting.pooled.find(x => x.id === id); if (!p || !p.authors[0] || !scene.nodes[p.authors[0]]) return;
+    const arcId = m.id + ">" + id, old = keep.get(arcId); if (old) { scene.arcGroup.add(old); return; }
+    const a = scene.nodes[m.id].position, b = scene.nodes[p.authors[0]].position, mid = a.clone().add(b).multiplyScalar(.5); mid.z = 1.6 + Math.abs(r.score) * .35;
+    const pts = new THREE.QuadraticBezierCurve3(a, mid, b).getPoints(40), g = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: hex(r.score >= 0 ? "--buy" : "--sell"), transparent: true, opacity: .2 + Math.abs(r.score) * .12, blending: THREE.AdditiveBlending }));
+    line.userData = { id: arcId, k: 0, n: pts.length }; g.setDrawRange(0, 0);
+    scene.arcGroup.add(line);
+  }));
+}
+
+function fallbackScene(){ const c=$("sceneCanvas"), s=$("ringSvg"); if(c)c.hidden=true; if(s)s.style.display="block"; buildRing(); }
+function moveScene(toStage){ const ring=document.querySelector(".ring"), host=toStage?$("stageScene"):document.querySelector(".hero"); if(ring&&host&&ring.parentElement!==host)host.append(ring); }
+function updateStage(){ const show=!!sitting; $("stage").hidden=!show; moveScene(show); updateArcs(); if(!show)return; const phase={propose:"Members are proposing",rate:"Members are rating",cio:"The CIO is ruling",done:"Sitting complete",stopped:"Sitting stopped"}[sitting.phase]||"The sitting"; $("stageState").textContent=phase; const current=MEMBERS.find(m=>(sitting.phase==="rate"?sitting.rstatus:sitting.status)[m.id]==="thinking"); $("thinkingMember").textContent=current?`${current.mark} · ${current.name}`:sitting.phase==="cio"?"CIO · decision room":"The committee"; let text=current?(demo?((sitting.phase==="rate"?demo.rateLines:demo.lines)[current.id]||""):(streamed[current.id]||`${current.lens}. Reasoning is arriving from Claude…`)):sitting.phase==="cio"?(demo?demo.cioNote:(streamed.cio||sitting.cio&&sitting.cio.note||"The CIO is weighing conviction against the house rules.")):"The completed record remains below."; if(demo&&(current||sitting.phase==="cio")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){text=text.slice(0,Math.max(1,Math.floor(demo.typed)));} $("thinkingText").textContent=text; const pills=$("memberPills");pills.replaceChildren(...MEMBERS.map(m=>h("span",{class:"member-pill "+((sitting.phase==="rate"?sitting.rstatus:sitting.status)[m.id]||"idle")},m.mark))); }
+function profileData(m){ const extra={quant:["trend and valuation","repeatable evidence","low-cost exposure"],reader:["sentiment shifts","consensus gaps","insider signals"],techbull:["AI adoption","cash-rich compounders","durable US growth"],income:["cash flow","low beta","covered dividends"],moonshot:["convex upside","earnings acceleration","asymmetric bets"],researcher:["low fees","broad diversification","published factor evidence"],goalkeeper:["time horizon","concentration","drawdown capacity"],taxcost:["after-tax returns","trading friction","fund structure"],stress:["crash loss","correlation shocks","single-name ruin"],cio:["clear trade-offs","house limits","implementable orders"]}; return {yes:extra[m.id],no:["a story without a number","risk that is not paid for"],ask:m.id==="stress"?"What breaks first when the bad day arrives?":m.id==="cio"?"Does this deserve to survive the rules?":"What would prove this idea wrong?"}; }
+function buildProfiles(){const box=$("committeeGrid");box.replaceChildren(...[...MEMBERS,{id:"cio",name:"The CIO",mark:"CI",lens:"Decision, limits and accountability",brief:"Rules on the committee record."}].map(m=>{const b=h("button",{class:"profile-card",type:"button"},h("span",{class:"badge"},m.mark),h("strong",{},m.name),h("span",{},m.lens));b.addEventListener("click",()=>openProfile(m.id));return b;}));}
+function openProfile(id){ const m=id==="cio"?{id:"cio",name:"The CIO",mark:"CI",lens:"Decision, limits and accountability",brief:"Rules on the committee record."}:MEMBERS.find(x=>x.id===id); if(!m)return; const d=profileData(m),sheet=h("div",{class:"profile-sheet",role:"dialog","aria-modal":"true","aria-label":m.name},h("div",{},h("button",{class:"btn",type:"button"},"Close"),h("h2",{},`${m.mark} · ${m.name}`),h("p",{},m.lens),h("h3",{},"What they look for"),h("ul",{},d.yes.map(x=>h("li",{},x))),h("h3",{},"What makes them say no"),h("ul",{},d.no.map(x=>h("li",{},x))),h("p",{},h("strong",{},"Always asks: "),d.ask),h("details",{},h("summary",{},"Prompt brief"),h("p",{class:"mono"},m.brief)))); const close=()=>{sheet.remove();if(location.hash===`#${id}`)history.back();};sheet.querySelector("button").onclick=close;sheet.addEventListener("click",e=>{if(e.target===sheet)close();});document.body.append(sheet);sheet.querySelector("button").focus();}
+window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(/^[a-z]+$/.test(id))openProfile(id);});
+function demoIdea(action,isin,sizePct,thesis){const u=UNI[isin];return {action,isin,name:u.name,ticker:u.ticker,type:u.type,sizePct,thesis,evidence:["Scripted illustration; check current facts."],priceEur:null,dailyMovePct:u.type==="fund"?1:2,verified:true};}
+// Scripted peer ratings: each member scores the four demo ideas from its own lens.
+const DEMO_RATES={
+ quant:{sell:[4,"Apple at 14% breaks the stated cap: a measurable risk."],core:[3,"Cheap, broad and in an uptrend."],bond:[1,"Bonds carry little momentum, but they diversify."],ai:[-1,"The trend is strong, yet the book already leans on tech."]},
+ reader:{sell:[2,"No bad news on Apple; the trim is about the rule, not the story."],core:[3,"A broad fund avoids betting on any single headline."],bond:[2,"Rate-cut talk makes duration reasonable."],ai:[-2,"AI is the most crowded story in the market."]},
+ techbull:{sell:[-2,"Selling a quality compounder hurts, even for a rule."],core:[3,"US large caps are most of the global core."],bond:[-2,"Bonds are a drag on long-run returns."],ai:[5,"The best business in the AI build-out."]},
+ income:{sell:[3,"Less single-name risk means steadier capital."],core:[2,"Fine, if a little racy for me."],bond:[5,"Ballast that pays a coupon."],ai:[-5,"No yield, high beta and a crowded trade."]},
+ moonshot:{sell:[-1,"Cutting a winner rarely pays."],core:[0,"An index cannot multiply."],bond:[-3,"Dead money for this horizon."],ai:[5,"The clearest multiplier on the list."]},
+ researcher:{sell:[4,"Concentration is uncompensated risk."],core:[5,"Low fees and broad diversification: the evidence."],bond:[3,"A sensible sleeve for a balanced investor."],ai:[-4,"Single-stock momentum is a story, not a premium."]},
+ goalkeeper:{sell:[5,"The investor set 10% as a limit; this restores it."],core:[3,"Diversified and within every cap."],bond:[4,"Cuts the drawdown on money with a horizon."],ai:[-4,"Adds a line that can halve."]},
+ taxcost:{sell:[2,"Sell only what the cap requires and accept a small realised gain."],core:[3,"One durable buy with low running costs."],bond:[1,"Low cost, but the income is taxed every year."],ai:[-2,"More turnover for no clear edge."]},
+ stress:{sell:[5,"A 14% single name is the first thing to break in a crash."],core:[2,"Still falls 50% in a 2008-style year."],bond:[4,"The only idea that cushions a crash."],ai:[-5,"An 80% single-name fall would cost 8 points."]}};
+function demoRate(member, idea){
+  const kind = idea.action !== "buy" ? "sell" : idea.isin === "IE00B4WXJJ64" ? "bond" : idea.isin === "US67066G1040" ? "ai" : "core";
+  const [score, why] = (DEMO_RATES[member] || {})[kind] || [0, "No strong view."];
+  return { score, why };
+}
+function startDemo(){ exitDemo(true); state=JSON.parse(JSON.stringify(EXAMPLE)); const snap=snapshot(); const lines={quant:"The broad funds already do most of the heavy lifting. Apple is above the stated single-company cap, a measurable concentration risk. Trim it and put a small amount into the lowest-cost global core.",reader:"The obvious stories in AI are crowded. A broad fund makes less use of a stale narrative than another single-name bet. The concentration trim is easier to defend.",techbull:"Apple remains a quality compounder, but the cap is a portfolio rule. I would fund the core allocation first and avoid selling good businesses simply because headlines wobble.",income:"The portfolio has little ballast when growth assets reprice. Euro government bonds can make the next drawdown easier to hold. That is useful even when yields are not exciting.",moonshot:"The sample is too cautious for upside. A small NVIDIA addition could be convex if AI demand keeps compounding. I accept that the others will call it crowded.",researcher:"Diversification and low cost beat an elaborate forecast. Use cash to strengthen the global core and reduce the over-cap company. Keep the implementation simple.",goalkeeper:"The 14% Apple line violates the investor's explicit 10% boundary. Repair that before taking any new risk. Bonds also fit a balanced, multi-year horizon.",taxcost:"A trim can create tax, so do no more than the cap requires. Prefer one or two durable changes over a stream of tiny trades.",stress:"In a 2008-style equity drawdown, the portfolio has too many assets that fall together. A small government-bond sleeve is not perfect in a 2022 shock, but it reduces single-name ruin and gives rebalancing capacity."};
+ const props={quant:[demoIdea("sell","US0378331005",4,"Bring Apple back to the 10% company limit.")],reader:[demoIdea("buy","IE00BK5BQT80",3,"Put cash into broad global exposure.")],techbull:[demoIdea("buy","IE00BK5BQT80",2,"Keep the core while retaining quality growth.")],income:[demoIdea("buy","IE00B4WXJJ64",3,"Add modest stabilising euro government bonds.")],moonshot:[demoIdea("buy","US67066G1040",3,"A higher-conviction AI allocation.")],researcher:[demoIdea("buy","IE00BK5BQT80",3,"Low-cost global diversification.")],goalkeeper:[demoIdea("sell","US0378331005",4,"Respect the investor's concentration cap.")],taxcost:[demoIdea("sell","US0378331005",4,"Trim only what the cap requires.")],stress:[demoIdea("buy","IE00B4WXJJ64",3,"Add a modest shock absorber to equity risk.")]};
+ sitting={at:new Date().toISOString(),snap,phase:"propose",status:{},proposals:{},pooled:[],ratings:{},rstatus:{},ranked:[],cio:null,orders:[],stopped:[],error:null,example:true};demo={lines,props,index:0,paused:false,speed:1,started:Date.now(),typed:0,speaker:null,rateLines:{},cioNote:DEMO_CIO.note};$("demoLabel").hidden=false;$("demoControls").hidden=false;render();$("stage").scrollIntoView({behavior:"smooth",block:"start"}); demoTick=setInterval(runDemo,120); }
+// The demo timeline at 1x: nine proposals (6 s each), nine ratings (2.4 s each), the CIO (9 s).
+const DEMO_CIO = { note: "First, repair the Apple breach: it sits above the 10% company limit you set. Then put a measured slice of cash into the low-cost global core and add a small euro bond sleeve, which the Stress Tester and Goal Keeper both rated highly. I reject the extra NVIDIA: it adds more of the same AI risk the portfolio already carries.",
+  approved: [["sell-US0378331005", 4, "Restores the stated company cap."], ["buy-IE00BK5BQT80", 3, "Broad, low-cost use of cash."], ["buy-IE00B4WXJJ64", 3, "Adds modest resilience."]],
+  rejected: [["buy-US67066G1040", "Too much correlated AI concentration."]] };
+const DEMO_STEP = { propose: 6000, rate: 2400, cio: 9000 };
+function speak(who){ if (demo.speaker !== who) { demo.speaker = who; demo.typed = 0; } }
+function demoTickTyping(dt){ demo.typed += dt * demo.speed / 17; }
+function runDemo(){
+  if (!demo || demo.paused) return;
+  const now = Date.now(), dt = now - (demo.lastTick || now); demo.lastTick = now; demoTickTyping(dt);
+  const elapsed = (now - demo.started) * demo.speed, p = demo.index;
+  if (p < 9) {                                   // proposals, one member at a time
+    const m = MEMBERS[p]; sitting.status[m.id] = "thinking"; speak(m.id);
+    if (elapsed >= DEMO_STEP.propose) { sitting.proposals[m.id] = demo.props[m.id]; sitting.status[m.id] = "done"; demo.index++; demo.started = now; }
+  } else if (p === 9) {                          // pool the ideas, open the rating round
+    pool(); sitting.phase = "rate"; MEMBERS.forEach(m => { sitting.rstatus[m.id] = "waiting"; });
+    demo.index++; demo.started = now;
+  } else if (p < 19) {                           // ratings, one member at a time, arcs appear as they score
+    const m = MEMBERS[p - 10]; sitting.rstatus[m.id] = "thinking"; speak("rate-" + m.id);
+    if (!demo.rateLines[m.id]) {
+      const mine = sitting.pooled.filter(x => !x.authors.includes(m.id));
+      sitting.ratings[m.id] = {};
+      mine.forEach(x => { sitting.ratings[m.id][x.id] = demoRate(m.id, x); });
+      demo.rateLines[m.id] = mine.map(x => { const r = sitting.ratings[m.id][x.id]; return `${x.action === "buy" ? "Buy" : "Trim"} ${x.name.split(/[ (]/)[0]} ${r.score > 0 ? "+" : ""}${r.score}: ${r.why}`; }).join("  ·  ");
+    }
+    if (elapsed >= DEMO_STEP.rate) { sitting.rstatus[m.id] = "done"; demo.index++; demo.started = now; }
+  } else if (p === 19) {                         // the CIO
+    rank(); sitting.phase = "cio"; speak("cio"); demo.index++; demo.started = now;
+  } else if (p === 20 && elapsed >= DEMO_STEP.cio) {
+    const find = id => sitting.pooled.find(x => x.id === id);
+    sitting.cio = { decision: "amend", note: DEMO_CIO.note,
+      approved: DEMO_CIO.approved.filter(([id]) => find(id)).map(([id, sizePct, why]) => ({ ideaId: find(id).id, sizePct, why })),
+      rejected: DEMO_CIO.rejected.filter(([id]) => find(id)).map(([id, why]) => ({ ideaId: find(id).id, why })) };
+    gates(); sitting.phase = "done"; clearInterval(demoTick); demoTick = null; speak(null); render();
+    setTimeout(() => { const r = $("ruling") || $("results"); if (r && demo) r.scrollIntoView({ behavior: "smooth", block: "start" }); }, 2600 / demo.speed);
+  }
+  render();
+}
+function nextDemo(){ if (!demo) return; demo.started = Date.now() - 1e7; demo.typed = 1e6; runDemo(); }
+function exitDemo(quiet){if(demoTick)clearInterval(demoTick);demoTick=null;demo=null;$("demoLabel").hidden=true;$("demoControls").hidden=true;if(!quiet){sitting=null;render();moveScene(false);}}
+$("playDemo").addEventListener("click",startDemo);$("loadSample").addEventListener("click",()=>{const p=parseTemplate(SAMPLE_CSV);applyRows(p.rows,p.cash,"Sample portfolio loaded.");state.example=true;renderExampleChip();save();});$("demoPause").addEventListener("click",()=>{if(!demo)return;demo.paused=!demo.paused;$("demoPause").textContent=demo.paused?"Play":"Pause";});$("demoSpeed").addEventListener("click",()=>{if(!demo)return;demo.speed=demo.speed===1?2:demo.speed===2?4:1;$("demoSpeed").textContent=`${demo.speed}×`;});$("demoNext").addEventListener("click",nextDemo);$("demoExit").addEventListener("click",()=>exitDemo(false));document.addEventListener("keydown",e=>{if(!demo)return;if(e.key===" "){e.preventDefault();$("demoPause").click();}if(e.key==="ArrowRight")nextDemo();if(e.key==="Escape")exitDemo(false);});
+buildProfiles();initScene();if(location.hash)openProfile(location.hash.slice(1));
 </script>
 
 </body>
