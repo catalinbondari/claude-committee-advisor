@@ -356,7 +356,7 @@ a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
       <p class="hero-sub">Load a portfolio and watch each member think, propose and rate the others. The CIO turns it into orders with limit prices.</p>
       <div class="hero-cta">
         <button class="btn primary big" id="playDemo">Play demo</button>
-        <a class="btn big" href="#s1">Use my portfolio</a>
+        <a class="btn big" href="#s1" id="analyseBtn">Analyse with your Claude subscription</a>
       </div>
       <dl class="hero-stats">
         <div><dt>Committee</dt><dd>9 + CIO</dd></div>
@@ -1776,6 +1776,7 @@ function runDemo(){
 function nextDemo(){ if (!demo) return; demo.started = Date.now() - 1e7; demo.typed = 1e6; runDemo(); }
 function exitDemo(quiet){if(demoTick)clearInterval(demoTick);demoTick=null;demo=null;$("demoLabel").hidden=true;$("demoControls").hidden=true;if(!quiet){sitting=null;render();moveScene(false);}}
 $("playDemo").addEventListener("click",startDemo);$("loadSample").addEventListener("click",()=>{const p=parseTemplate(SAMPLE_CSV);applyRows(p.rows,p.cash,"Sample portfolio loaded.");state.example=true;renderExampleChip();save();});$("demoPause").addEventListener("click",()=>{if(!demo)return;demo.paused=!demo.paused;$("demoPause").textContent=demo.paused?"Play":"Pause";});$("demoSpeed").addEventListener("click",()=>{if(!demo)return;demo.speed=demo.speed===1?2:demo.speed===2?4:1;$("demoSpeed").textContent=`${demo.speed}×`;});$("demoNext").addEventListener("click",nextDemo);$("demoExit").addEventListener("click",()=>exitDemo(false));document.addEventListener("keydown",e=>{if(!demo)return;if(e.key===" "){e.preventDefault();$("demoPause").click();}if(e.key==="ArrowRight")nextDemo();if(e.key==="Escape")exitDemo(false);});
+if(!window.claude){const a=$("analyseBtn");a.href=$("openClaude").href;a.target="_blank";a.rel="noopener";}
 buildProfiles();initScene();if(location.hash)openProfile(location.hash.slice(1));
 </script>
 
