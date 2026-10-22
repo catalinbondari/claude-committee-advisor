@@ -660,6 +660,7 @@ let running = false, halt = null;
 const live = new Set();
 let timerId = null;
 let scene = null;   // the 3D committee; declared early because render() reaches it
+let demo = null, demoTick = null;   // the scripted demo; render() reads it too
 let streamed = {};
 
 /* ---------- helpers ---------- */
@@ -1017,6 +1018,7 @@ const label = p => p.ticker || p.isin;
 
 async function convene() {
   if (!sample || running) return;
+  if (demo) exitDemo(true);          // a real sitting replaces a demo that is playing
   running = true; halt = null; setConvene();
   await identify();
   const snap = snapshot();
@@ -1470,7 +1472,7 @@ US0378331005,14
 US67066G1040,10
 NL0010273215,9
 CASH,6`;
-let demo = null, demoTick = null;
+
 function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 function hex(name) { return new THREE.Color(css(name)); }
 /* ---------- the 3D committee ----------
@@ -1740,7 +1742,8 @@ function demoRate(member, idea){
   const [score, why] = (DEMO_RATES[member] || {})[kind] || [0, "No strong view."];
   return { score, why };
 }
-function startDemo(){ exitDemo(true); state=JSON.parse(JSON.stringify(EXAMPLE)); const snap=snapshot(); const lines={quant:"The broad funds already do most of the heavy lifting. Apple is above the stated single-company cap, a measurable concentration risk. Trim it and put a small amount into the lowest-cost global core.",reader:"The obvious stories in AI are crowded. A broad fund makes less use of a stale narrative than another single-name bet. The concentration trim is easier to defend.",techbull:"Apple remains a quality compounder, but the cap is a portfolio rule. I would fund the core allocation first and avoid selling good businesses simply because headlines wobble.",income:"The portfolio has little ballast when growth assets reprice. Euro government bonds can make the next drawdown easier to hold. That is useful even when yields are not exciting.",moonshot:"The sample is too cautious for upside. A small NVIDIA addition could be convex if AI demand keeps compounding. I accept that the others will call it crowded.",researcher:"Diversification and low cost beat an elaborate forecast. Use cash to strengthen the global core and reduce the over-cap company. Keep the implementation simple.",goalkeeper:"The 14% Apple line violates the investor's explicit 10% boundary. Repair that before taking any new risk. Bonds also fit a balanced, multi-year horizon.",taxcost:"A trim can create tax, so do no more than the cap requires. Prefer one or two durable changes over a stream of tiny trades.",stress:"In a 2008-style equity drawdown, the portfolio has too many assets that fall together. A small government-bond sleeve is not perfect in a 2022 shock, but it reduces single-name ruin and gives rebalancing capacity."};
+function startDemo(){ if (running) return;   // never over a real sitting
+  exitDemo(true); state=JSON.parse(JSON.stringify(EXAMPLE)); const snap=snapshot(); const lines={quant:"The broad funds already do most of the heavy lifting. Apple is above the stated single-company cap, a measurable concentration risk. Trim it and put a small amount into the lowest-cost global core.",reader:"The obvious stories in AI are crowded. A broad fund makes less use of a stale narrative than another single-name bet. The concentration trim is easier to defend.",techbull:"Apple remains a quality compounder, but the cap is a portfolio rule. I would fund the core allocation first and avoid selling good businesses simply because headlines wobble.",income:"The portfolio has little ballast when growth assets reprice. Euro government bonds can make the next drawdown easier to hold. That is useful even when yields are not exciting.",moonshot:"The sample is too cautious for upside. A small NVIDIA addition could be convex if AI demand keeps compounding. I accept that the others will call it crowded.",researcher:"Diversification and low cost beat an elaborate forecast. Use cash to strengthen the global core and reduce the over-cap company. Keep the implementation simple.",goalkeeper:"The 14% Apple line violates the investor's explicit 10% boundary. Repair that before taking any new risk. Bonds also fit a balanced, multi-year horizon.",taxcost:"A trim can create tax, so do no more than the cap requires. Prefer one or two durable changes over a stream of tiny trades.",stress:"In a 2008-style equity drawdown, the portfolio has too many assets that fall together. A small government-bond sleeve is not perfect in a 2022 shock, but it reduces single-name ruin and gives rebalancing capacity."};
  const props={quant:[demoIdea("sell","US0378331005",4,"Bring Apple back to the 10% company limit.")],reader:[demoIdea("buy","IE00BK5BQT80",3,"Put cash into broad global exposure.")],techbull:[demoIdea("buy","IE00BK5BQT80",2,"Keep the core while retaining quality growth.")],income:[demoIdea("buy","IE00B4WXJJ64",3,"Add modest stabilising euro government bonds.")],moonshot:[demoIdea("buy","US67066G1040",3,"A higher-conviction AI allocation.")],researcher:[demoIdea("buy","IE00BK5BQT80",3,"Low-cost global diversification.")],goalkeeper:[demoIdea("sell","US0378331005",4,"Respect the investor's concentration cap.")],taxcost:[demoIdea("sell","US0378331005",4,"Trim only what the cap requires.")],stress:[demoIdea("buy","IE00B4WXJJ64",3,"Add a modest shock absorber to equity risk.")]};
  sitting={at:new Date().toISOString(),snap,phase:"propose",status:{},proposals:{},pooled:[],ratings:{},rstatus:{},ranked:[],cio:null,orders:[],stopped:[],error:null,example:true};demo={lines,props,index:0,paused:false,speed:1,started:Date.now(),typed:0,speaker:null,rateLines:{},cioNote:DEMO_CIO.note};$("demoLabel").hidden=false;$("demoControls").hidden=false;render();$("stage").scrollIntoView({behavior:"smooth",block:"start"}); demoTick=setInterval(runDemo,120); }
 // The demo timeline at 1x: nine proposals (6 s each), nine ratings (2.4 s each), the CIO (9 s).
