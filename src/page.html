@@ -236,6 +236,8 @@ table.matrix th.m, table.matrix td.m { text-align: center; width: 44px; padding:
 table.matrix td.m { font-weight: 600; }
 table.matrix td.m span { display: inline-grid; place-items: center; min-width: 32px; height: 26px; }
 table.matrix .own { color: var(--muted); }
+.own-tag { font: 600 9.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-2); border-radius: 4px; padding: 3px 4px; min-width: 0 !important; height: auto !important; }
+.matrix-key { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
 .idcell { white-space: nowrap; }
 .whys { display: grid; gap: 12px; margin-top: 10px; }
 .whys .w { font-size: 15px; color: var(--ink-2); }
@@ -1236,7 +1238,7 @@ function renderRatings() {
     return h("tr", {},
       h("td", { class: "idcell" }, ideaLine(p)),
       MEMBERS.map(m => {
-        if (p.authors.includes(m.id)) return h("td", { class: "m own", title: `${m.name} proposed it` }, "✎");
+        if (p.authors.includes(m.id)) return h("td", { class: "m own", title: `${m.name} proposed this idea, so it does not score it` }, h("span", { class: "own-tag" }, "Own"));
         const r = s.ratings[m.id] && s.ratings[m.id][id];
         if (!r) return h("td", { class: "m own", title: s.rstatus[m.id] === "thinking" ? "Thinking…" : "No rating" }, s.rstatus[m.id] === "thinking" ? "…" : "·");
         return h("td", { class: "m", title: `${m.name}: ${r.why}` }, h("span", { style: scoreStyle(r.score) }, (r.score > 0 ? "+" : "") + r.score));
@@ -1244,7 +1246,8 @@ function renderRatings() {
       h("td", { class: "n num" }, st.mean != null ? (st.mean > 0 ? "+" : "") + st.mean.toFixed(1) : "–"),
       h("td", { class: "n num" }, st.spread != null ? String(st.spread) : "–"));
   });
-  box.append(h("div", { class: "tablewrap" }, h("table", { class: "matrix" }, h("thead", {}, thead), h("tbody", {}, rows))));
+  box.append(h("div", { class: "tablewrap" }, h("table", { class: "matrix" }, h("thead", {}, thead), h("tbody", {}, rows))),
+    h("p", { class: "hint matrix-key" }, "Scores run from −5 to +5. Own: that member proposed the idea, and nobody scores their own. A dot means no score came back."));
   const wide = (s.ranked || []).filter(r => r.spread != null).sort((a, b) => b.spread - a.spread)[0];
   if (wide && wide.spread >= 3) {
     const p = s.pooled.find(x => x.id === wide.id);
