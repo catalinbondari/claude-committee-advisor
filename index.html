@@ -928,7 +928,7 @@ Size each as sizePct: percentage points of the whole portfolio (3 means 3% of it
 ISINs: for a holding, copy it from the table; for a new line, prefer one from the verified list, and give any other only if you are certain of it.
 Give a one-sentence thesis and up to four evidence points with the numbers you used. For each idea also give type ("fund" or "stock"), priceEur (the holding's price from the table, or your best last-known price per share in euro, or null) and dailyMovePct (its typical daily move in %, e.g. 1.2).
 
-Reply with only JSON: {"ideas":[{"action":"buy","isin":"","name":"","type":"fund","sizePct":0,"thesis":"","evidence":[""],"priceEur":null,"dailyMovePct":1.0}]}`;
+Reply with only JSON, starting with your reasoning: {"reasoning":"2-3 plain sentences on what you see in this portfolio","ideas":[{"action":"buy","isin":"","name":"","type":"fund","sizePct":0,"thesis":"","evidence":[""],"priceEur":null,"dailyMovePct":1.0}]}`;
 
 const RATE = `## Your task
 Rate each of your colleagues' ideas below from -5 (would damage this portfolio by your lens) to +5 (exactly what your lens wants). Use the whole range and say why in one short sentence each.`;
@@ -938,13 +938,20 @@ Approve at most three, amend sizes if needed, and reject the rest with a reason 
 Prefer ideas the committee broadly agrees on; a contested idea (spread above 3) needs a strong case. If nothing clears the bar, reject everything and say why holding is right.
 Write a 2-3 sentence note to the investor in plain words.
 
-Reply with only JSON: {"decision":"approve|amend|reject","note":"","approved":[{"ideaId":"","sizePct":0,"why":""}],"rejected":[{"ideaId":"","why":""}]}`;
+Reply with only JSON, starting with your reasoning: {"reasoning":"2-3 plain sentences weighing the committee's views","decision":"approve|amend|reject","note":"","approved":[{"ideaId":"","sizePct":0,"why":""}],"rejected":[{"ideaId":"","why":""}]}`;
 
 /* ---------- running the sitting ---------- */
+// While a member's JSON answer streams in, show the human parts of it: its reasoning first, then
+// each thesis or why as it is written. A half-written string at the end is shown as it grows.
+function readable(raw) {
+  const out = [], re = /"(reasoning|thesis|why|note)"\s*:\s*"((?:[^"\\]|\\.)*)/g;
+  let m; while ((m = re.exec(String(raw || "")))) { const t = m[2].replace(/\\n/g, " ").replace(/\\"/g, '"').replace(/\\(.)/g, "$1").trim(); if (t) out.push(t); }
+  return out.length ? out.join("  ·  ") : "Reading the portfolio…";
+}
 async function ask(prompt, opts, speaker) {
   const ctl = new AbortController();
   live.add(ctl);
-  try { return await sample.json(prompt, { ...opts, signal: ctl.signal, onText: text => { if (speaker) { streamed[speaker] = String(text || ""); render(); } } }); }
+  try { return await sample.json(prompt, { ...opts, signal: ctl.signal, onText: ({ text }) => { if (speaker) { streamed[speaker] = readable(text); render(); } } }); }
   finally { live.delete(ctl); }
 }
 function stopAll(reason) { if (!halt) halt = reason; for (const c of live) c.abort(); }
@@ -1040,7 +1047,7 @@ async function convene() {
     sitting.rstatus[m.id] = "thinking"; render();
     const list = theirs.map(p => ({ ideaId: p.id, proposer: p.authors.map(a => NAME[a]).join(" + "), action: p.action, isin: p.isin, name: p.name, type: p.type, sizePct: p.sizePct, thesis: p.thesis, evidence: p.evidence }));
     try {
-      const out = await ask(`${m.brief}\n\n${base}\n\n## Ideas to rate\n${JSON.stringify(list)}\n\n${RATE}\n\nReply with only JSON: {"ratings":{"<ideaId>":{"score":0,"why":""}}} covering every idea listed.`, { modelTier: "default" }, m.id);
+      const out = await ask(`${m.brief}\n\n${base}\n\n## Ideas to rate\n${JSON.stringify(list)}\n\n${RATE}\n\nReply with only JSON, starting with your reasoning: {"reasoning":"1-2 plain sentences on the ideas overall","ratings":{"<ideaId>":{"score":0,"why":""}}} covering every idea listed.`, { modelTier: "default" }, m.id);
       const r = (out && out.ratings) || {};
       sitting.ratings[m.id] = {};
       for (const p of theirs) {
@@ -1164,7 +1171,7 @@ function setConvene() {
   const b = $("conveneBtn");
   const has = state.holdings.some(r => isinOk(r.isin)) || num(state.cash) > 0;
   b.disabled = !claudeReady || running || !has;
-  b.textContent = running ? "The committee is sitting…" : state.example ? "Convene on the example" : sitting && sitting.phase === "done" ? "Convene again" : "Convene the committee";
+  b.textContent = running ? "The committee is sitting…" : state.example ? "Analyse the example portfolio" : sitting && sitting.phase === "done" ? "Analyse again" : "Analyse my portfolio";
   $("stopBtn").hidden = !running;
 }
 
@@ -1448,6 +1455,7 @@ buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render();
   try { const caps = await sample.limits(); imagesOK = !!(caps && caps.images); } catch { imagesOK = false; }
   if (!imagesOK) { $("file").accept = ".csv,.txt,.tsv"; $("readState").textContent = ""; }
   claudeReady = true;
+  $("analyseBtn").textContent = "Analyse my portfolio";
   setConvene();
   identify();
 })();
