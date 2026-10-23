@@ -444,7 +444,7 @@ CASH,8</pre>
           <h3>Your situation</h3>
           <div class="fields">
             <label>Risk
-              <select id="risk"><option value="cautious">Cautious</option><option value="balanced">Balanced</option><option value="adventurous">Adventurous</option></select></label>
+              <select id="risk"><option value="cautious">Cautious: funds and shares</option><option value="moderate">Moderate: funds and shares</option><option value="longterm">Long term: funds and shares</option><option value="equity">Equity only: shares, no funds</option></select></label>
             <label>Horizon
               <select id="horizon">
                 <option value="under 1 year">Under 1 year</option><option value="1-3 years">1–3 years</option>
@@ -608,6 +608,12 @@ const UNIVERSE = [
   ["GB0009895292", "AZN", "AstraZeneca", "stock"],
 ].map(([isin, ticker, name, type]) => ({ isin, ticker, name, type }));
 const UNI = Object.fromEntries(UNIVERSE.map(u => [u.isin, u]));
+// Latest Yahoo Finance close per ISIN, in euro, with the typical daily move. Written by
+// scripts/update_prices.py (daily on GitHub); the page cannot reach Yahoo itself.
+/* PRICES:BEGIN */
+const PRICES = {"CH0038863350":{"d":"2026-10-23","m":1.19,"p":90.52,"s":"NESN.SW"},"DE0007030033":{"d":"2026-10-23","m":2.28,"p":1025.6,"s":"RHM.DE"},"DE0007164600":{"d":"2026-10-23","m":1.89,"p":211.5,"s":"SAP.DE"},"DK0062498333":{"d":"2026-10-23","m":2.12,"p":35.28,"s":"NOVO-B.CO"},"FR0000121014":{"d":"2026-10-23","m":1.47,"p":381.6,"s":"MC.PA"},"GB0009895292":{"d":"2026-10-23","m":1.98,"p":153.12,"s":"AZN.L"},"IE000XZSV718":{"d":"2026-10-23","m":0.62,"p":16.95,"s":"SPYL.DE"},"IE00B1XNHC34":{"d":"2026-10-23","m":1.4,"p":8.28,"s":"INRG.MI"},"IE00B3F81R35":{"d":"2026-10-23","m":0.19,"p":116.35,"s":"IEAC.AS"},"IE00B3RBWM25":{"d":"2026-10-23","m":0.61,"p":163.54,"s":"VWRL.AS"},"IE00B3WJKG14":{"d":"2026-10-23","m":1.26,"p":45.38,"s":"QDVE.DE"},"IE00B3XXRP09":{"d":"2026-10-23","m":0.62,"p":129.57,"s":"VUSA.DE"},"IE00B4K48X80":{"d":"2026-10-23","m":0.59,"p":103.56,"s":"IMAE.AS"},"IE00B4L5Y983":{"d":"2026-10-23","m":0.58,"p":129.91,"s":"IWDA.AS"},"IE00B4ND3602":{"d":"2026-10-23","m":null,"p":69.61,"s":"SGLN.MI"},"IE00B4WXJJ64":{"d":"2026-10-23","m":0.29,"p":105.21,"s":"IEGA.AS"},"IE00B53SZB19":{"d":"2026-10-23","m":1.05,"p":1489.4,"s":"CNDX.AS"},"IE00B579F325":{"d":"2026-10-23","m":1.29,"p":345.12,"s":"SGLD.AS"},"IE00B5BMR087":{"d":"2026-10-23","m":0.62,"p":738.54,"s":"CSSPX.MI"},"IE00B6YX5C33":{"d":"2026-10-23","m":0.61,"p":78.61,"s":"USDV.MI"},"IE00B8GKDB10":{"d":"2026-10-23","m":0.41,"p":82.35,"s":"VHYL.AS"},"IE00BF4RFH31":{"d":"2026-10-23","m":0.66,"p":9.03,"s":"IUSN.DE"},"IE00BFMXXD54":{"d":"2026-10-23","m":0.62,"p":132.43,"s":"VUAA.DE"},"IE00BGV5VN51":{"d":"2026-10-23","m":1.23,"p":210.8,"s":"XAIX.DE"},"IE00BK5BQT80":{"d":"2026-10-23","m":0.62,"p":169.26,"s":"VWCE.DE"},"IE00BKM4GZ66":{"d":"2026-10-23","m":1.22,"p":45.33,"s":"EIMI.MI"},"IE00BKX55T58":{"d":"2026-10-23","m":0.61,"p":127.45,"s":"VEVE.AS"},"IE00BM67HK77":{"d":"2026-10-23","m":1.05,"p":58.97,"s":"XDWH.DE"},"IE00BM67HT60":{"d":"2026-10-23","m":1.29,"p":127.66,"s":"XDWT.DE"},"IE00BP3QZ601":{"d":"2026-10-23","m":0.52,"p":80.39,"s":"IWQU.MI"},"IE00BP3QZ825":{"d":"2026-10-23","m":1.17,"p":97.95,"s":"IWMO.MI"},"IE00BP3QZB59":{"d":"2026-10-23","m":0.73,"p":70.05,"s":"IWVL.MI"},"IE00BTJRMP35":{"d":"2026-10-23","m":1.25,"p":76.94,"s":"XMME.DE"},"IE00BYZK4552":{"d":"2026-10-23","m":1.43,"p":18.89,"s":"RBOT.MI"},"LU0290358497":{"d":"2026-10-23","m":0.01,"p":150.58,"s":"XEON.DE"},"NL0010273215":{"d":"2026-10-23","m":2.2,"p":1423.2,"s":"ASML.AS"},"US02079K3059":{"d":"2026-10-22","m":1.85,"p":289.4,"s":"GOOGL"},"US0231351067":{"d":"2026-10-22","m":2.74,"p":223.49,"s":"AMZN"},"US0378331005":{"d":"2026-10-22","m":1.55,"p":310.82,"s":"AAPL"},"US0846707026":{"d":"2026-10-22","m":0.81,"p":488.23,"s":"BRK-B"},"US11135F1012":{"d":"2026-10-22","m":2.44,"p":288.52,"s":"AVGO"},"US1912161007":{"d":"2026-10-22","m":1.0,"p":85.1,"s":"KO"},"US30303M1027":{"d":"2026-10-22","m":3.06,"p":579.16,"s":"META"},"US46625H1005":{"d":"2026-10-22","m":0.99,"p":300.4,"s":"JPM"},"US4781601046":{"d":"2026-10-22","m":1.52,"p":238.87,"s":"JNJ"},"US5949181045":{"d":"2026-10-22","m":2.5,"p":465.12,"s":"MSFT"},"US67066G1040":{"d":"2026-10-22","m":2.28,"p":189.42,"s":"NVDA"},"US69608A1088":{"d":"2026-10-22","m":4.82,"p":175.12,"s":"PLTR"},"US7427181091":{"d":"2026-10-22","m":1.25,"p":147.81,"s":"PG"},"US88160R1014":{"d":"2026-10-22","m":2.49,"p":334.35,"s":"TSLA"},"US92826C8394":{"d":"2026-10-22","m":1.17,"p":369.84,"s":"V"}};
+/* PRICES:END */
+const yahoo = isin => PRICES[isin] || null;
 
 const MEMBERS = [
   { id: "quant", name: "The Quant", mark: "Qu", lens: "Momentum, trend, valuation: only what can be measured",
@@ -632,9 +638,9 @@ const MEMBERS = [
 const NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name]));
 
 const EXAMPLE = {
-  example: true, risk: "balanced", horizon: "3-10 years", maxSingle: 10, cash: 6, value: 25000, ids: {},
+  example: true, risk: "moderate", horizon: "3-10 years", maxSingle: 10, cash: 6, value: 25000, ids: {},
   holdings: [
-    { isin: "IE00BK5BQT80", name: "", type: "", weight: 25, price: 138.5 },
+    { isin: "IE00BK5BQT80", name: "", type: "", weight: 25, price: null },
     { isin: "IE00B5BMR087", name: "", type: "", weight: 20, price: null },
     { isin: "IE00BKM4GZ66", name: "", type: "", weight: 8, price: null },
     { isin: "IE00B4WXJJ64", name: "", type: "", weight: 8, price: null },
@@ -759,7 +765,16 @@ function updateTotals() {
 }
 function renderExampleChip() { $("exampleChip").hidden = !state.example; }
 
+// The four risk profiles, as the committee is told them. Older saved choices map onto them.
+const RISK = {
+  cautious: "Cautious: protect capital first; mostly broad funds and bonds, small positions in single shares",
+  moderate: "Moderate: a balance of broad funds and individual shares",
+  longterm: "Long term: growth over many years; funds and shares, accepting deeper drawdowns along the way",
+  equity: "Equity only: individual shares only - no funds, ETFs, bonds or ETCs",
+};
+const riskKey = v => RISK[v] ? v : v === "balanced" ? "moderate" : v === "adventurous" ? "longterm" : "moderate";
 function bindSituation() {
+  state.risk = riskKey(state.risk);
   for (const id of ["cash", "value", "horizon", "risk", "maxSingle"]) {
     const el = $(id);
     el.value = state[id] ?? "";
@@ -890,12 +905,12 @@ function snapshot() {
     const id = info(r.isin) || {};
     return { isin: r.isin, ticker: id.ticker || null, name: nameOf(r) || "unknown", type: typeOf(r) || "unknown",
       weightPct: round((num(r.weight) || 0) * k, 2), priceEur: num(r.price), priceIsYours: num(r.price) != null,
-      lastKnownPriceEur: num(r.price) ?? id.priceEur ?? null, dailyMovePct: id.dailyMovePct ?? null };
+      lastKnownPriceEur: num(r.price) ?? (yahoo(r.isin) && yahoo(r.isin).p) ?? id.priceEur ?? null, dailyMovePct: (yahoo(r.isin) && yahoo(r.isin).m) ?? id.dailyMovePct ?? null };
   });
   const cashPct = round((num(state.cash) || 0) * k, 2);
   return {
     date: today(), value, cashPct, minPts, maxSingle: num(state.maxSingle) ?? 10, holdings,
-    investor: { risk: state.risk, horizon: state.horizon, maxPctInOneCompany: num(state.maxSingle) ?? 10,
+    investor: { risk: RISK[riskKey(state.risk)], horizon: state.horizon, maxPctInOneCompany: num(state.maxSingle) ?? 10,
       cashToInvestPct: cashPct, portfolioValueEur: value ?? "not given", minimumTradePts: minPts },
   };
 }
@@ -977,7 +992,7 @@ function cleanIdeas(out, snap) {
       type: (hr && hr.type !== "unknown" && hr.type) || (known && known.type) || (x.type === "fund" ? "fund" : "stock"),
       sizePct: num(x.sizePct), thesis: String(x.thesis || "").slice(0, 400),
       evidence: (Array.isArray(x.evidence) ? x.evidence : []).slice(0, 4).map(s => String(s).slice(0, 240)),
-      priceEur: num(x.priceEur), dailyMovePct: num(x.dailyMovePct), verified: !!(hr || UNI[isin]),
+      priceEur: (yahoo(isin) && yahoo(isin).p) ?? num(x.priceEur), dailyMovePct: (yahoo(isin) && yahoo(isin).m) ?? num(x.dailyMovePct), verified: !!(hr || UNI[isin]),
     };
   }).filter(x => isinOk(x.isin) && x.sizePct > 0 && (x.action === "buy" || held[x.isin]));
 }
@@ -1101,6 +1116,8 @@ function gates() {
     if (p.action === "sell") {
       if (!held[p.isin]) { stopped.push({ ...p, why: "Not held, so it can't be sold." }); continue; }
       if (size > from) { size = from; notes.push("Cut to the whole holding."); }
+    } else if (p.type === "fund" && /^Equity only/.test(snap.investor.risk)) {
+      stopped.push({ ...p, why: "Equity-only profile: the investor holds shares only, so no fund is bought." }); continue;
     } else if (p.type !== "fund") {
       const room = snap.maxSingle - from;
       if (size > room) { size = Math.max(0, room); notes.push(`Cut so it stays at ${snap.maxSingle}% of the portfolio or less.`); }
@@ -1130,11 +1147,13 @@ function gates() {
 
 function withLimit(o, hRow, snap) {
   const mine = hRow && hRow.priceIsYours ? hRow.priceEur : null;
-  const px = mine ?? (hRow && hRow.lastKnownPriceEur) ?? (state.ids[o.isin] && state.ids[o.isin].priceEur) ?? o.priceEur ?? null;
-  const move = clamp(o.dailyMovePct || (hRow && hRow.dailyMovePct) || (o.type === "fund" ? 1.0 : 2.0), 0.3, 6);
+  const y = yahoo(o.isin);
+  const px = mine ?? (y && y.p) ?? (hRow && hRow.lastKnownPriceEur) ?? (state.ids[o.isin] && state.ids[o.isin].priceEur) ?? o.priceEur ?? null;
+  const source = mine != null ? "yours" : y && y.p ? "yahoo" : px ? "claude" : null;
+  const move = clamp((y && y.m) || o.dailyMovePct || (hRow && hRow.dailyMovePct) || (o.type === "fund" ? 1.0 : 2.0), 0.3, 6);
   const band = clamp(0.8 * move, 0.3, 3) / 100;
   const to = o.action === "buy" ? o.from + o.size : o.from - o.size;
-  const out = { ...o, to, band, price: px, estimate: mine == null, expires: addSessions(LIMIT_SESSIONS), notes: [...o.notes] };
+  const out = { ...o, to, band, price: px, source, estimate: source === "claude", expires: addSessions(LIMIT_SESSIONS), notes: [...o.notes] };
   if (snap.value) out.amount = o.size / 100 * snap.value;
   if (px) {
     const raw = o.action === "buy" ? px * (1 - band) : px * (1 + band);
@@ -1144,6 +1163,7 @@ function withLimit(o, hRow, snap) {
       out.shares = Math.floor(out.amount / out.limit);
       if (!out.shares) out.notes.push("Less than one share: buy a fraction if your broker allows it, or skip.");
     }
+    if (source === "yahoo") out.notes.push(`Price: Yahoo Finance close on ${y.d} (${y.s}). Check the live price before you place it.`);
     if (out.estimate) out.notes.push(`Price from Claude's memory. Check the live price and keep the limit ${(band * 100).toFixed(1)}% ${o.action === "buy" ? "under" : "over"} it.`);
   } else out.notes.push(`No price known: set the limit ${(band * 100).toFixed(1)}% ${o.action === "buy" ? "under" : "over"} the live price.`);
   if (o.action === "sell" && to < 0.05) out.notes.unshift("Sell the whole holding: all your shares.");
@@ -1456,7 +1476,7 @@ buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render();
 
 /* ---------- room scene, profiles and offline demo ---------- */
 const SAMPLE_CSV = `isin,weight,price
-IE00BK5BQT80,25,138.50
+IE00BK5BQT80,25
 IE00B5BMR087,20
 IE00BKM4GZ66,8
 IE00B4WXJJ64,8
@@ -1718,7 +1738,7 @@ function profileData(m){ const extra={quant:["trend and valuation","repeatable e
 function buildProfiles(){const box=$("committeeGrid");box.replaceChildren(...[...MEMBERS,{id:"cio",name:"The CIO",mark:"CI",lens:"Decision, limits and accountability",brief:"Rules on the committee record."}].map(m=>{const b=h("button",{class:"profile-card",type:"button"},h("span",{class:"badge"},m.mark),h("strong",{},m.name),h("span",{},m.lens));b.addEventListener("click",()=>openProfile(m.id));return b;}));}
 function openProfile(id){ const m=id==="cio"?{id:"cio",name:"The CIO",mark:"CI",lens:"Decision, limits and accountability",brief:"Rules on the committee record."}:MEMBERS.find(x=>x.id===id); if(!m)return; const d=profileData(m),sheet=h("div",{class:"profile-sheet",role:"dialog","aria-modal":"true","aria-label":m.name},h("div",{},h("button",{class:"btn",type:"button"},"Close"),h("h2",{},`${m.mark} · ${m.name}`),h("p",{},m.lens),h("h3",{},"What they look for"),h("ul",{},d.yes.map(x=>h("li",{},x))),h("h3",{},"What makes them say no"),h("ul",{},d.no.map(x=>h("li",{},x))),h("p",{},h("strong",{},"Always asks: "),d.ask),h("details",{},h("summary",{},"Prompt brief"),h("p",{class:"mono"},m.brief)))); const close=()=>{sheet.remove();if(location.hash===`#${id}`)history.back();};sheet.querySelector("button").onclick=close;sheet.addEventListener("click",e=>{if(e.target===sheet)close();});document.body.append(sheet);sheet.querySelector("button").focus();}
 window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(/^[a-z]+$/.test(id))openProfile(id);});
-function demoIdea(action,isin,sizePct,thesis){const u=UNI[isin];return {action,isin,name:u.name,ticker:u.ticker,type:u.type,sizePct,thesis,evidence:["Scripted illustration; check current facts."],priceEur:null,dailyMovePct:u.type==="fund"?1:2,verified:true};}
+function demoIdea(action,isin,sizePct,thesis){const u=UNI[isin];return {action,isin,name:u.name,ticker:u.ticker,type:u.type,sizePct,thesis,evidence:["Scripted illustration; check current facts."],priceEur:(yahoo(isin)&&yahoo(isin).p)||null,dailyMovePct:(yahoo(isin)&&yahoo(isin).m)||(u.type==="fund"?1:2),verified:true};}
 // Scripted peer ratings: each member scores the four demo ideas from its own lens.
 const DEMO_RATES={
  quant:{sell:[4,"Apple at 14% breaks the stated cap: a measurable risk."],core:[3,"Cheap, broad and in an uptrend."],bond:[1,"Bonds carry little momentum, but they diversify."],ai:[-1,"The trend is strong, yet the book already leans on tech."]},

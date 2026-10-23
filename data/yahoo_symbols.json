@@ -1,0 +1,283 @@
+{
+ "CH0038863350": {
+  "currency": "CHF",
+  "name": "Nestl\u00e9",
+  "symbol": "NESN.SW"
+ },
+ "DE0007030033": {
+  "currency": "EUR",
+  "name": "Rheinmetall",
+  "symbol": "RHM.DE"
+ },
+ "DE0007164600": {
+  "currency": "EUR",
+  "name": "SAP",
+  "symbol": "SAP.DE"
+ },
+ "DK0062498333": {
+  "currency": "DKK",
+  "name": "Novo Nordisk (B)",
+  "symbol": "NOVO-B.CO"
+ },
+ "FR0000121014": {
+  "currency": "EUR",
+  "name": "LVMH",
+  "symbol": "MC.PA"
+ },
+ "GB0009895292": {
+  "currency": "GBp",
+  "name": "AstraZeneca",
+  "symbol": "AZN.L"
+ },
+ "IE000XZSV718": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "SPDR S&P 500 (Acc)",
+  "symbol": "SPYL.DE"
+ },
+ "IE00B1XNHC34": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Global Clean Energy",
+  "symbol": "INRG.MI"
+ },
+ "IE00B3F81R35": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Core Euro Corporate Bond",
+  "symbol": "IEAC.AS"
+ },
+ "IE00B3RBWM25": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard FTSE All-World (Dist)",
+  "symbol": "VWRL.AS"
+ },
+ "IE00B3WJKG14": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares S&P 500 Information Technology Sector",
+  "symbol": "QDVE.DE"
+ },
+ "IE00B3XXRP09": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard S&P 500 (Dist)",
+  "symbol": "VUSA.DE"
+ },
+ "IE00B4K48X80": {
+  "currency": "EUR",
+  "name": "iShares Core MSCI Europe (Acc)",
+  "symbol": "IMAE.AS"
+ },
+ "IE00B4L5Y983": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Core MSCI World (Acc)",
+  "symbol": "IWDA.AS"
+ },
+ "IE00B4ND3602": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Physical Gold ETC",
+  "symbol": "SGLN.MI"
+ },
+ "IE00B4WXJJ64": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Core Euro Government Bond",
+  "symbol": "IEGA.AS"
+ },
+ "IE00B53SZB19": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Nasdaq 100 (Acc)",
+  "symbol": "CNDX.AS"
+ },
+ "IE00B579F325": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Invesco Physical Gold ETC",
+  "symbol": "SGLD.AS"
+ },
+ "IE00B5BMR087": {
+  "currency": "EUR",
+  "name": "iShares Core S&P 500 (Acc)",
+  "symbol": "CSSPX.MI"
+ },
+ "IE00B6YX5C33": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "SPDR S&P US Dividend Aristocrats",
+  "symbol": "USDV.MI"
+ },
+ "IE00B8GKDB10": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard FTSE All-World High Dividend Yield",
+  "symbol": "VHYL.AS"
+ },
+ "IE00BF4RFH31": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares MSCI World Small Cap (Acc)",
+  "symbol": "IUSN.DE"
+ },
+ "IE00BFMXXD54": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard S&P 500 (Acc)",
+  "symbol": "VUAA.DE"
+ },
+ "IE00BGV5VN51": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Xtrackers Artificial Intelligence & Big Data",
+  "symbol": "XAIX.DE"
+ },
+ "IE00BK5BQT80": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard FTSE All-World (Acc)",
+  "symbol": "VWCE.DE"
+ },
+ "IE00BKM4GZ66": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Core MSCI EM IMI (Acc)",
+  "symbol": "EIMI.MI"
+ },
+ "IE00BKX55T58": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Vanguard FTSE Developed World (Dist)",
+  "symbol": "VEVE.AS"
+ },
+ "IE00BM67HK77": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Xtrackers MSCI World Health Care",
+  "symbol": "XDWH.DE"
+ },
+ "IE00BM67HT60": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Xtrackers MSCI World Information Technology",
+  "symbol": "XDWT.DE"
+ },
+ "IE00BP3QZ601": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Edge MSCI World Quality Factor",
+  "symbol": "IWQU.MI"
+ },
+ "IE00BP3QZ825": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Edge MSCI World Momentum Factor",
+  "symbol": "IWMO.MI"
+ },
+ "IE00BP3QZB59": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Edge MSCI World Value Factor",
+  "symbol": "IWVL.MI"
+ },
+ "IE00BTJRMP35": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "Xtrackers MSCI Emerging Markets (Acc)",
+  "symbol": "XMME.DE"
+ },
+ "IE00BYZK4552": {
+  "checked": true,
+  "currency": "EUR",
+  "name": "iShares Automation & Robotics",
+  "symbol": "RBOT.MI"
+ },
+ "LU0290358497": {
+  "currency": "EUR",
+  "name": "Xtrackers II EUR Overnight Rate Swap",
+  "symbol": "XEON.DE"
+ },
+ "NL0010273215": {
+  "currency": "EUR",
+  "name": "ASML Holding",
+  "symbol": "ASML.AS"
+ },
+ "US02079K3059": {
+  "currency": "USD",
+  "name": "Alphabet (Class A)",
+  "symbol": "GOOGL"
+ },
+ "US0231351067": {
+  "currency": "USD",
+  "name": "Amazon",
+  "symbol": "AMZN"
+ },
+ "US0378331005": {
+  "currency": "USD",
+  "name": "Apple",
+  "symbol": "AAPL"
+ },
+ "US0846707026": {
+  "currency": "USD",
+  "name": "Berkshire Hathaway (Class B)",
+  "symbol": "BRK-B"
+ },
+ "US11135F1012": {
+  "currency": "USD",
+  "name": "Broadcom",
+  "symbol": "AVGO"
+ },
+ "US1912161007": {
+  "currency": "USD",
+  "name": "Coca-Cola",
+  "symbol": "KO"
+ },
+ "US30303M1027": {
+  "currency": "USD",
+  "name": "Meta Platforms",
+  "symbol": "META"
+ },
+ "US46625H1005": {
+  "currency": "USD",
+  "name": "JPMorgan Chase",
+  "symbol": "JPM"
+ },
+ "US4781601046": {
+  "currency": "USD",
+  "name": "Johnson & Johnson",
+  "symbol": "JNJ"
+ },
+ "US5949181045": {
+  "currency": "USD",
+  "name": "Microsoft",
+  "symbol": "MSFT"
+ },
+ "US67066G1040": {
+  "currency": "USD",
+  "name": "NVIDIA",
+  "symbol": "NVDA"
+ },
+ "US69608A1088": {
+  "currency": "USD",
+  "name": "Palantir",
+  "symbol": "PLTR"
+ },
+ "US7427181091": {
+  "currency": "USD",
+  "name": "Procter & Gamble",
+  "symbol": "PG"
+ },
+ "US88160R1014": {
+  "currency": "USD",
+  "name": "Tesla",
+  "symbol": "TSLA"
+ },
+ "US92826C8394": {
+  "currency": "USD",
+  "name": "Visa",
+  "symbol": "V"
+ }
+}

@@ -65,3 +65,16 @@ Edit `src/page.html` (it is published to Claude as it is), then run
 `python3 build.py` to rebuild `index.html` for this site.
 
 An independent tool that runs on Claude; not made or endorsed by Anthropic.
+
+## Prices
+
+Limit prices use the latest **Yahoo Finance** close for every ISIN in the page's list, in euro
+(euro listings preferred; US, Swiss, Danish and London lines converted at the day's rate), with
+each line's typical daily move from its last 60 sessions. The page cannot reach Yahoo itself, so
+`scripts/update_prices.py` writes the snapshot into the page, and the **Refresh prices** GitHub
+Action runs it every weekday after the US close. A price you enter yourself always wins.
+
+## Risk profiles
+
+Cautious, Moderate and Long term use funds and shares; **Equity only** holds individual shares,
+and the house rules never buy a fund for it.
