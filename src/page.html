@@ -296,6 +296,8 @@ a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
 .stage-bar .demo-controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .stage-scene .ring .g-sub, .stage-scene .ring figcaption, .stage-scene .ring .g-title { display: none; }
+.hero .ring .g-sub, .hero .ring figcaption { display: none; }   /* the caption sits under the hero text instead, clear of the ring */
+.hero-note { margin-top: 14px; font: 400 13px/1.45 var(--sans); color: var(--muted); max-width: 46ch; }
 .scene-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
 .s-label { position: absolute; left: 0; top: 0; text-align: center; white-space: nowrap; font: 500 11px/1.25 var(--mono);
   letter-spacing: .06em; text-transform: uppercase; color: var(--fg-2); text-shadow: 0 1px 8px var(--bg), 0 0 2px var(--bg);
@@ -310,8 +312,8 @@ a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
   opacity: 0; transition: opacity .35s ease; will-change: transform; }
 .s-bubble.on { opacity: 1; }
 .s-bubble b { display: block; margin-bottom: 4px; font: 600 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--bub, var(--accent)); }
-@media (min-width: 900px) { .hero .ring { left: 44%; } }
-@media (max-width: 899px) { .hero { display: flex; flex-direction: column; } .hero .ring { position: relative; inset: auto; height: 460px; order: 2; } }
+@media (min-width: 900px) { .hero .ring { left: 46%; } .hero-copy { max-width: calc(46% - 24px); position: relative; z-index: 2; } }
+@media (max-width: 899px) { .hero { display: flex; flex-direction: column; } .hero .ring { position: relative; inset: auto; width: 100%; height: 440px; order: 2; flex: none; } }
 @media (max-width: 640px) { .stage-scene { height: 520px; } .s-label { font-size: 9.5px; } .s-label small { display: none; } .s-label.on small { display: block; } .s-bubble { font-size: 12px; width: 78%; } }
 
 </style>
@@ -352,6 +354,7 @@ a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
         <div><dt>One sitting</dt><dd>3–6 min</dd></div>
         <div><dt>Runs on</dt><dd>your plan</dd></div>
       </dl>
+      <p class="hero-note">Each member proposes and rates; the CIO rules. The ring lights up live during a sitting.</p>
     </div>
     <figure class="ring" aria-label="The committee: nine members around the CIO">
       <div class="g-title">The committee</div>
@@ -1557,7 +1560,7 @@ function initScene() {
     scene = { labels, cioLabel, bubble, renderer, world, camera, tilt, group, ring, dots, dust, nodes, cio, cioCore, cioShell, cioGlow, pulses, stream, streamOff, motes, arcGroup, look,
       active: true, visible: true, last: 0, moteKey: "", from: null, cioHeat: 0,
       reduce: matchMedia("(prefers-reduced-motion: reduce)").matches };
-    const resize = () => { const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; const asp = r.width / r.height; camera.position.z = asp < 1 ? 21 : asp > 1.5 ? 17.5 : 16.5; camera.updateProjectionMatrix(); camera.lookAt(0, -.9, 0); };
+    const resize = () => { const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; const asp = r.width / r.height, inHero = !!canvas.closest(".hero"); camera.position.z = (asp < 1 ? 21 : asp > 1.5 ? 17.5 : 16.5) + (inHero ? 3 : 0); /* further back in the hero so every label fits */ camera.updateProjectionMatrix(); camera.lookAt(0, -.9, 0); };
     new ResizeObserver(resize).observe(canvas); resize();
     new IntersectionObserver(x => { scene.visible = x[0].isIntersecting; }, { threshold: .01 }).observe(canvas);
     document.addEventListener("visibilitychange", () => { scene.active = !document.hidden; });
@@ -1669,7 +1672,8 @@ function updateLabels(working, ph) {
     const word = on ? (ph === "rate" ? "rating ideas…" : "proposing…") : ph === "propose" && st === "done" ? ((sitting.proposals[m.id] || []).length ? `${sitting.proposals[m.id].length} idea${sitting.proposals[m.id].length > 1 ? "s" : ""}` : "no trade") : STATE_WORD[st] || "";
     if (l.lastChild.textContent !== word) l.lastChild.textContent = word;
     l.classList.toggle("on", !!on);
-    l.style.transform = `translate(${x.toFixed(1)}px, ${(y + 14 + n.scale.x * 9).toFixed(1)}px) translateX(-50%)`;
+    const half = l.offsetWidth / 2 + 6, lx = Math.max(half, Math.min(w - half, x));   /* keep the whole name inside the frame */
+    l.style.transform = `translate(${lx.toFixed(1)}px, ${(y + 14 + n.scale.x * 9).toFixed(1)}px) translateX(-50%)`;
     if (on) anchor = { x, y: y - 16 - n.scale.x * 10, hue: n.userData.hue, title: `${m.name} · ${ph === "rate" ? "rating" : "proposing"}` };
   });
   const [cx, cy] = at(scene.cio), cioWord = ph === "cio" ? "ruling…" : ph === "done" ? (sitting.cio ? sitting.cio.decision : "") : "";
