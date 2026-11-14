@@ -225,7 +225,7 @@ table.hold tfoot .sum td { border-top: 1px solid var(--ink); padding-top: 10px; 
 .idea { border-top: 1px dotted var(--rule); padding-top: 8px; display: grid; gap: 5px; }
 .line { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 .act { font: 700 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; color: #fff; }
-.act.buy { background: var(--teal); } .act.sell { background: var(--claret); }
+.act.buy { background: var(--teal); } .act.sell, .act.trim { background: var(--claret); }
 .tick { font-weight: 700; font-size: 14px; }
 .sub { font-size: 13px; color: var(--muted); }
 .thesis { font: 400 16px/1.45 var(--serif); }
@@ -390,6 +390,7 @@ a { color:var(--accent); } :focus-visible { outline-color:var(--accent); }
       <p class="stdesc">Upload a CSV or pick holdings from the list. The committee only knows what is in the table below.</p>
 
       <div id="claudeBanner" class="banner" hidden></div>
+      <div id="bondBanner" class="banner" hidden></div>
 
       <div class="loadgrid">
         <div class="card">
@@ -419,6 +420,10 @@ CASH,8</pre>
               <button class="btn quiet" id="loadSample">Load the sample portfolio</button>
               <a class="btn quiet" href="https://github.com/catalinbondari/claude-committee-advisor/blob/main/samples/sample-portfolio.csv" target="_blank" rel="noopener">Get the sample CSV</a>
               <button class="btn quiet" id="copyTpl">Copy the template</button>
+            </div>
+            <div class="row">
+              <label class="btn filebtn" id="bondLbl">Load a Bond evidence file<input type="file" id="bondFile" accept=".json,application/json"></label>
+              <span class="hint">From Bond's Run advice button: the committee then sits on Bond's books with Bond's members.</span>
             </div>
             <details id="pasteBox">
               <summary>Or paste the lines</summary>
@@ -617,7 +622,7 @@ const PRICES = {"CH0038863350":{"d":"2026-11-12","m":1.16,"p":93.72,"s":"NESN.SW
 /* PRICES:END */
 const yahoo = isin => PRICES[isin] || null;
 
-const MEMBERS = [
+const BASE_MEMBERS = [
   { id: "quant", name: "The Quant", mark: "Qu", lens: "Momentum, trend, valuation: only what can be measured",
     brief: "You are the Quant. You trust only what can be measured and back-tested: 12-1 momentum, the 200-day trend, the gap between the growth a price implies and the growth the business can sustain, and cost. Ignore stories and headlines." },
   { id: "reader", name: "The Reader", mark: "Re", lens: "News, analyst consensus, SEC filings, sentiment",
@@ -637,7 +642,11 @@ const MEMBERS = [
   { id: "stress", name: "The Stress Tester", mark: "St", lens: "Worst cases: crashes, drawdowns, what breaks first",
     brief: "You are the Stress Tester. You assume the bad day comes. For every idea, ask what it does in a 2008-style crash (-50% equities), a 2022-style rate shock (bonds and growth fall together) and a single-name collapse (-80%). You favour ideas that cut the portfolio's worst-case loss and you mark down anything that adds a hidden way to lose a lot. You are the most cautious member." },
 ];
-const NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name]));
+// The members who sit: these nine, or Bond's own eight when a Bond evidence file is loaded.
+let MEMBERS = BASE_MEMBERS;
+let NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name]));
+let bond = null;   // the Bond evidence pack, while one is loaded
+function seatMembers(list) { MEMBERS = list; NAME = Object.fromEntries(MEMBERS.map(m => [m.id, m.name])); }
 
 const EXAMPLE = {
   example: true, risk: "moderate", horizon: "3-10 years", maxSingle: 10, cash: 6, value: 25000, ids: {},
@@ -708,12 +717,14 @@ const typeOf = r => r.type || (info(r.isin) && info(r.isin).type) || "";
 const tickerOf = isin => (info(isin) && info(isin).ticker) || "";
 
 function save() { try { localStorage.setItem(KEY, JSON.stringify({ state, sitting })); } catch {} }
+const BOND_SITTING_KIND = "bond-committee-sitting";
 function load() {
   try {
     const blob = JSON.parse(localStorage.getItem(KEY));
     if (blob && blob.state) { state = { ...EXAMPLE, ...blob.state, ids: blob.state.ids || {} }; sitting = blob.sitting || null; }
   } catch {}
   if (sitting && sitting.phase !== "done" && sitting.phase !== "stopped") { sitting.phase = "stopped"; sitting.error = "This sitting was interrupted when the page closed."; }
+  if (sitting && sitting.bond) seatMembers(sitting.members || BASE_MEMBERS);   // a Bond sitting keeps Bond's members on screen
 }
 
 /* ---------- holdings table ---------- */
@@ -1025,7 +1036,9 @@ function rank() {
 const label = p => p.ticker || p.isin;
 
 async function convene() {
+  if (bond) return conveneBond();
   if (!sample || running) return;
+  if (sitting && sitting.bond) { seatMembers(BASE_MEMBERS); showBondBanner(); buildProfiles(); }   // back to the nine for an own portfolio
   if (demo) exitDemo(true);          // a real sitting replaces a demo that is playing
   running = true; halt = null; setConvene();
   await identify();
@@ -1099,8 +1112,228 @@ function finish() {
   if (!sitting) { setConvene(); return; }
   if (halt) { sitting.phase = "stopped"; sitting.error = HALT_TEXT[halt] || "The sitting stopped early."; }
   else if (sitting.error) sitting.phase = "stopped";
-  else { gates(); sitting.phase = "done"; }
+  else { if (!sitting.bond) gates(); sitting.phase = "done"; }
   render(); save();
+}
+
+/* ---------- a Bond sitting ----------
+   Bond's Run advice hands over an evidence file: both books' evidence, Bond's eight members and
+   their briefs, the prompts and what each book may trade. The committee sits on it here exactly as
+   it does from Claude Code; Bond's own gates (house calls, the mortgage step, caps, limit prices)
+   run when the finished sitting is uploaded back on Bond's Advice tab. */
+const BOND_PACK_KIND = "bond-committee-pack";
+const BOND_ENGINE = "Claude sub-agents, sat in the Claude Committee Advisor";
+
+function bondMembers(pack) {
+  return pack.members.map(pm => {
+    const b = BASE_MEMBERS.find(x => x.id === pm.id) || { mark: String(pm.name || pm.id).replace(/^The /, "").slice(0, 2) };
+    return { ...b, id: pm.id, name: pm.name || b.name, lens: pm.lens || b.lens || "", brief: pm.brief };
+  });
+}
+function showBondBanner() {
+  const b = $("bondBanner");
+  const on = bond || (sitting && sitting.bond);
+  b.hidden = !on;
+  if (!on) return;
+  const leave = h("button", { class: "btn quiet", type: "button", style: "margin-left:10px" }, "Leave Bond mode");
+  leave.addEventListener("click", leaveBond);
+  b.replaceChildren(bond
+    ? `Bond evidence loaded: the page of ${bond.asOf}, books ${Object.keys(bond.books).join(" and ")}. ${MEMBERS.length} of Bond's members sit with Bond's briefs and prompts; the table below is not used.`
+    : `Showing the last Bond sitting (${sitting.asOf}). Load a new Bond evidence file to sit again.`, leave);
+}
+function loadBond(pack) {
+  if (!pack || pack.kind !== BOND_PACK_KIND || !pack.books || !Array.isArray(pack.members) || !pack.prompts || !pack.checks)
+    throw new Error("That is not a Bond evidence file. Use the file Bond's Run advice button saves.");
+  if (running) throw new Error("Wait for the sitting to finish first.");
+  if (demo) exitDemo(true);
+  bond = pack; seatMembers(bondMembers(pack)); sitting = null; streamed = {};
+  showBondBanner(); buildProfiles(); render(); save();
+}
+function leaveBond() {
+  if (running) return;
+  bond = null; if (sitting && sitting.bond) sitting = null;
+  seatMembers(BASE_MEMBERS); showBondBanner(); buildProfiles(); render(); save();
+}
+const bondBase = () => Object.keys(bond.books).map(b => `# Book: ${b}\n\n${bond.books[b]}`).join("\n\n");
+
+// The same checks Bond's pool runs: a ticker from the book's candidates, a sale only of what is held
+// and no bigger than the holding, at most two ideas per book.
+function bondClean(member, out) {
+  const ideas = [];
+  for (const book of Object.keys(bond.books)) {
+    const c = bond.checks[book] || { candidates: [], held: {}, names: {} };
+    const allowed = new Set(c.candidates);
+    for (const x of (out && Array.isArray(out[book]) ? out[book] : []).slice(0, 2)) {
+      const t = String(x.ticker || "").trim(), action = String(x.action || "").toLowerCase();
+      if (!["buy", "sell", "trim"].includes(action) || !allowed.has(t) || (action !== "buy" && !(t in c.held))) continue;
+      let amount = num(x.eur); if (amount == null) continue;
+      amount = Math.max(0, amount); if (action !== "buy") amount = Math.min(amount, c.held[t] || 0);
+      const bondId = `${member}-${action}-${t}`;
+      ideas.push({ id: `${book}|${bondId}`, bondId, book, author: member, authors: [member], action, ticker: t, isin: t,
+        name: c.names[t] || t, eur: round(amount, 2), thesis: String(x.thesis || "").slice(0, 400),
+        evidence: (Array.isArray(x.evidence) ? x.evidence : []).slice(0, 4).map(e => String(e).slice(0, 160)) });
+    }
+  }
+  return ideas;
+}
+function bondPool() {
+  const seen = new Set(); sitting.pooled = [];
+  for (const m of MEMBERS) for (const x of (sitting.proposals[m.id] || [])) {
+    const key = `${x.book}|${x.action === "buy" ? "buy" : "sell"}|${x.ticker}`;
+    if (!seen.has(key)) { seen.add(key); sitting.pooled.push(x); }
+  }
+}
+// A model sometimes shortens an id ("goalkeeper-buy-XEON" for "goalkeeper-buy-XEON.DE").
+function bondPick(got, id) {
+  if (!got || typeof got !== "object") return null;
+  if (got[id]) return got[id];
+  const near = Object.keys(got).filter(k => k.length >= 6 && id.startsWith(k));
+  return near.length === 1 ? got[near[0]] : null;
+}
+
+async function conveneBond() {
+  if (!sample || running) return;
+  if (demo) exitDemo(true);
+  running = true; halt = null;
+  const books = Object.keys(bond.books), base = bondBase();
+  streamed = {};
+  sitting = { bond: true, at: new Date().toISOString(), asOf: bond.asOf, books, members: MEMBERS, phase: "propose", status: {}, proposals: {},
+    pooled: [], ratings: {}, rstatus: {}, ranked: [], cio: null, rulings: null, orders: [], stopped: [], error: null };
+  setConvene(); startTimer(); render();
+  $("s2").scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const propose = `${bond.prompts.propose}\n\nAnswer with ONLY a JSON object of this shape, no prose: {"<book>": [ ... ]} - one key per book (${books.join(", ")}), at most two ideas per book, tickers copied exactly from that book's Candidates table. Shape: ${bond.shapes.proposals}`;
+  await runPool(MEMBERS.map(m => async () => {
+    sitting.status[m.id] = "thinking"; render();
+    try {
+      const out = await ask(`${m.brief}\n\n${base}\n\n${propose}`, { modelTier: "default" }, m.id);
+      sitting.proposals[m.id] = bondClean(m.id, out);
+      sitting.status[m.id] = "done";
+    } catch (e) { failMember(sitting.status, m.id, e); }
+    render(); save();
+  }), CONCURRENCY);
+  if (halt) return finish();
+
+  bondPool();
+  if (!sitting.pooled.length) { sitting.error = "No member proposed a trade Bond's evidence allows. Nothing to rate."; return finish(); }
+
+  sitting.phase = "rate"; render();
+  await runPool(MEMBERS.map(m => async () => {
+    const theirs = sitting.pooled.filter(p => p.author !== m.id);
+    if (!theirs.length) { sitting.rstatus[m.id] = "done"; sitting.ratings[m.id] = {}; return; }
+    sitting.rstatus[m.id] = "thinking"; render();
+    const lists = books.map(b => `# Ideas to rate - ${b}\n` + JSON.stringify(theirs.filter(p => p.book === b).map(p => ({
+      id: p.bondId, author: p.author, proposer: NAME[p.author], action: p.action, ticker: p.ticker, name: p.name,
+      eur: p.eur, thesis: p.thesis, evidence: p.evidence })), null, 1)).join("\n\n");
+    try {
+      const out = await ask(`${m.brief}\n\n${base}\n\n${lists}\n\n${bond.prompts.rate}\n\nAnswer with ONLY JSON: {"<book>": {"<ideaId>": {"score": <integer -5..5>, "why": "<one sentence>"}}} covering every listed idea.`, { modelTier: "default" }, m.id);
+      sitting.ratings[m.id] = {};
+      for (const p of theirs) {
+        const x = bondPick(out && out[p.book], p.bondId), sc = x && num(x.score);
+        if (sc != null) sitting.ratings[m.id][p.id] = { score: clamp(Math.round(sc), -5, 5), why: String(x.why || "").slice(0, 300) };
+      }
+      sitting.rstatus[m.id] = "done";
+    } catch (e) { failMember(sitting.rstatus, m.id, e); }
+    render(); save();
+  }), CONCURRENCY);
+  if (halt) return finish();
+
+  rank();
+  sitting.phase = "cio"; render();
+  const tables = books.map(b => {
+    const rows = sitting.ranked.map(r => sitting.pooled.find(p => p.id === r.id)).filter(p => p && p.book === b).map((p, i) => {
+      const r = sitting.ranked.find(x => x.id === p.id);
+      return { ideaId: p.bondId, rank: i + 1, proposer: p.author, action: p.action, ticker: p.ticker, eur: p.eur, thesis: p.thesis,
+        mean: r.mean == null ? null : round(r.mean, 2), spread: r.spread,
+        scores: Object.fromEntries(MEMBERS.filter(m => sitting.ratings[m.id] && sitting.ratings[m.id][p.id]).map(m => [m.id, sitting.ratings[m.id][p.id].score])) };
+    });
+    return `# Ranked ideas - ${b}\n` + JSON.stringify(rows, null, 1);
+  }).join("\n\n");
+  try {
+    const out = await ask(`${bond.prompts.cio}\n\n${base}\n\n${tables}\n\nAnswer with ONLY JSON: {"<book>": {"decision": "approve|amend|reject", "note": "...", "approved": [{"ideaId": "...", "eur": 0, "why": "..."}], "rejected": [{"ideaId": "...", "why": "..."}]}}`, { modelTier: "complex" }, "cio");
+    sitting.rulings = {};
+    const approved = [], rejected = [], notes = [];
+    for (const b of books) {
+      const r = (out && out[b]) || {}, ids = new Set(sitting.pooled.filter(p => p.book === b).map(p => p.bondId));
+      const fix = id => ids.has(String(id)) ? String(id) : [...ids].find(x => x.startsWith(String(id)) && String(id).length >= 6) || String(id);
+      const ruling = {
+        decision: ["approve", "amend", "reject"].includes(r.decision) ? r.decision : "reject",
+        note: String(r.note || "").slice(0, 900),
+        approved: (Array.isArray(r.approved) ? r.approved : []).map(a => ({ ideaId: fix(a.ideaId), eur: num(a.eur) ?? 0, why: String(a.why || "").slice(0, 400) })),
+        rejected: (Array.isArray(r.rejected) ? r.rejected : []).map(a => ({ ideaId: fix(a.ideaId), why: String(a.why || "").slice(0, 400) })),
+      };
+      sitting.rulings[b] = ruling;
+      approved.push(...ruling.approved.map(a => ({ ...a, ideaId: `${b}|${a.ideaId}` })));
+      rejected.push(...ruling.rejected.map(a => ({ ...a, ideaId: `${b}|${a.ideaId}` })));
+      notes.push(`${b}: ${ruling.note}`);
+    }
+    const ds = books.map(b => sitting.rulings[b].decision);
+    sitting.cio = { decision: ds.every(d => d === "reject") ? "reject" : ds.includes("amend") ? "amend" : "approve", note: notes.join(" "), approved, rejected };
+  } catch (e) {
+    if (FATAL.has(e && e.code)) stopAll(e.code);
+    else if (e && e.code === "cancelled") stopAll("user");
+    else sitting.error = "The CIO didn't answer. The proposals and ratings are kept; convene again to get a ruling.";
+  }
+  finish();
+}
+
+// The file Bond's "Upload the sitting" takes: the pooled ideas, every score and the CIO's rulings, in Bond's ids.
+function bondSittingFile(s) {
+  const pooled = {}, ratings = {};
+  for (const b of s.books) pooled[b] = s.pooled.filter(p => p.book === b).map(p => ({ id: p.bondId, author: p.author, action: p.action,
+    ticker: p.ticker, name: p.name, eur: p.eur, thesis: p.thesis, evidence: p.evidence }));
+  for (const m of s.members) {
+    ratings[m.id] = Object.fromEntries(s.books.map(b => [b, {}]));
+    for (const [id, r] of Object.entries(s.ratings[m.id] || {})) {
+      const p = s.pooled.find(x => x.id === id); if (p) ratings[m.id][p.book][p.bondId] = r;
+    }
+  }
+  return { kind: BOND_SITTING_KIND, asOf: s.asOf, sat: s.at, engine: BOND_ENGINE, pooled, ratings, rulings: s.rulings };
+}
+async function saveBondSitting(btn, s) {
+  const name = `bond-sitting-${s.asOf}.json`, data = JSON.stringify(bondSittingFile(s));
+  let dl = null; try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch {}
+  if (dl) {
+    try { await dl.save({ filename: name, data }); btn.textContent = "Saved"; return; }
+    catch (e) { if (e && e.code === "declined") return; }
+  }
+  try {   // outside Claude, or saves unavailable here: a plain download link
+    const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+    const a = h("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000); btn.textContent = "Saved";
+  } catch { btn.textContent = "Couldn't save: use Copy instead"; }
+}
+function renderBondRuling(box, s) {
+  const ruling = h("div", { class: "ruling" });
+  for (const b of s.books) {
+    const r = (s.rulings || {})[b] || { decision: "reject", note: "", approved: [], rejected: [] };
+    const byId = id => s.pooled.find(p => p.book === b && p.bondId === id);
+    ruling.append(h("div", { class: "verdict" },
+      h("div", { class: "stamp " + r.decision }, { approve: "Approved", amend: "Amended", reject: "Hold" }[r.decision]),
+      h("p", { class: "note" }, r.note || "No note.", h("small", {}, `${b} · CIO · Bond page of ${s.asOf}`))));
+    if (r.approved.length) {
+      ruling.append(h("div", { class: "tablewrap" }, h("table", { class: "orders" },
+        h("thead", {}, h("tr", {}, h("th", {}, ""), h("th", {}, "Holding"), h("th", { class: "n" }, "€"), h("th", {}, "Why"))),
+        h("tbody", {}, r.approved.map(a => { const p = byId(a.ideaId) || { action: "?", ticker: a.ideaId, name: "", author: "" };
+          return h("tr", {}, h("td", {}, h("span", { class: "act " + p.action }, p.action)),
+            h("td", {}, h("span", { class: "tick" }, p.ticker), h("div", { class: "hint" }, p.name)),
+            h("td", { class: "n num" }, eur(a.eur || p.eur)),
+            h("td", { class: "why" }, a.why, h("div", { class: "hint" }, "Idea: " + (NAME[p.author] || p.author)))); })))));
+    } else ruling.append(h("p", { class: "empty" }, "No trade approved for this book."));
+    if (r.rejected.length) ruling.append(h("ul", { class: "stopped" }, r.rejected.map(x => { const p = byId(x.ideaId);
+      return h("li", {}, p ? h("span", { class: "act " + p.action, style: "margin-right:6px" }, p.action) : null, h("span", { class: "tick" }, p ? p.ticker : x.ideaId), x.why); })));
+  }
+  const save = h("button", { class: "btn primary", type: "button" }, "Download the sitting for Bond");
+  save.addEventListener("click", () => saveBondSitting(save, s));
+  const copy = h("button", { class: "btn quiet", type: "button" }, "Copy the sitting");
+  copy.addEventListener("click", async () => {
+    const text = JSON.stringify(bondSittingFile(s));
+    try { await navigator.clipboard.writeText(text); copy.textContent = "Copied"; }
+    catch { const t = h("textarea", { style: "width:100%;min-height:80px" }); t.value = text; copy.replaceWith(t); t.select(); }
+  });
+  ruling.append(h("div", { class: "row" }, save, copy),
+    h("p", { class: "fine" }, "Next: on Bond's Advice tab press Upload the sitting and choose this file. Bond then applies its house rules (house calls, the mortgage step, caps, minimum trade), keeps the monthly step as Trading 212 cash, sets each order's shares, limit and expiry, and publishes the minutes. It recommends; you decide."));
+  box.append(ruling);
 }
 
 /* ---------- house rules and limit prices ---------- */
@@ -1184,9 +1417,9 @@ function setMap(n, cls, text) {
 }
 function setConvene() {
   const b = $("conveneBtn");
-  const has = state.holdings.some(r => isinOk(r.isin)) || num(state.cash) > 0;
+  const has = bond || state.holdings.some(r => isinOk(r.isin)) || num(state.cash) > 0;
   b.disabled = !claudeReady || running || !has;
-  b.textContent = running ? "The committee is sitting…" : state.example ? "Analyse the example portfolio" : sitting && sitting.phase === "done" ? "Analyse again" : "Analyse my portfolio";
+  b.textContent = running ? "The committee is sitting…" : bond ? `Convene on Bond's books (${bond.asOf})` : state.example ? "Analyse the example portfolio" : sitting && sitting.phase === "done" ? "Analyse again" : "Analyse my portfolio";
   $("stopBtn").hidden = !running;
 }
 
@@ -1201,20 +1434,20 @@ function render() {
   setStation("s1", s ? "done" : null); setMap(1, s ? "done" : null);
   const proposed = s ? MEMBERS.filter(m => s.status[m.id] === "done").length : 0;
   const ideaCount = s ? Object.values(s.proposals).reduce((n, a) => n + a.length, 0) : 0;
-  if (!s) { setChip("c2", "", "Waiting"); setStation("s2"); setMap(2, null, "9 members"); }
-  else if (ph === "propose") { setChip("c2", "run", `${proposed} of 9 in`); setStation("s2", "run"); setMap(2, "run", `${proposed} of 9 in`); }
-  else { setChip("c2", proposed ? "done" : "fail", `${proposed} of 9 · ${ideaCount} ideas`); setStation("s2", proposed ? "done" : "fail"); setMap(2, proposed ? "done" : "fail", `${ideaCount} ideas`); }
+  if (!s) { setChip("c2", "", "Waiting"); setStation("s2"); setMap(2, null, `${MEMBERS.length} members`); }
+  else if (ph === "propose") { setChip("c2", "run", `${proposed} of ${MEMBERS.length} in`); setStation("s2", "run"); setMap(2, "run", `${proposed} of ${MEMBERS.length} in`); }
+  else { setChip("c2", proposed ? "done" : "fail", `${proposed} of ${MEMBERS.length} · ${ideaCount} ideas`); setStation("s2", proposed ? "done" : "fail"); setMap(2, proposed ? "done" : "fail", `${ideaCount} ideas`); }
   renderMembers();
   const rated = s ? MEMBERS.filter(m => s.rstatus[m.id] === "done").length : 0;
   if (!s || ph === "propose") { setChip("c3", "", "Waiting"); setStation("s3"); setMap(3, null, "−5 to +5"); }
-  else if (ph === "rate") { setChip("c3", "run", `${rated} of 9 in`); setStation("s3", "run"); setMap(3, "run", `${rated} of 9 in`); }
+  else if (ph === "rate") { setChip("c3", "run", `${rated} of ${MEMBERS.length} in`); setStation("s3", "run"); setMap(3, "run", `${rated} of ${MEMBERS.length} in`); }
   else if (!s.pooled.length) { setChip("c3", "", "Nothing to rate"); setStation("s3"); setMap(3, null, "Nothing to rate"); }
-  else { setChip("c3", rated ? "done" : "fail", `${rated} of 9 rated`); setStation("s3", rated ? "done" : "fail"); setMap(3, rated ? "done" : "fail", `${s.pooled.length} ideas rated`); }
+  else { setChip("c3", rated ? "done" : "fail", `${rated} of ${MEMBERS.length} rated`); setStation("s3", rated ? "done" : "fail"); setMap(3, rated ? "done" : "fail", `${s.pooled.length} ideas rated`); }
   renderRatings();
   if (!s || ph === "propose" || ph === "rate") { setChip("c4", "", "Waiting"); setStation("s4"); setMap(4, null, "Orders with limits"); }
   else if (ph === "cio") { setChip("c4", "run", "Ruling"); setStation("s4", "run"); setMap(4, "run", "Ruling…"); }
   else if (ph === "stopped") { setChip("c4", "fail", "Stopped"); setStation("s4", "fail"); setMap(4, "fail", "Stopped"); }
-  else { const n = s.orders.length; const t = n ? `${n} order${n > 1 ? "s" : ""}` : "Hold"; setChip("c4", "done", t); setStation("s4", "done"); setMap(4, "done", t); }
+  else { const n = s.bond ? (s.cio.approved || []).length : s.orders.length; const t = n ? `${n} ${s.bond ? "approved" : "order" + (n > 1 ? "s" : "")}` : "Hold"; setChip("c4", "done", t); setStation("s4", "done"); setMap(4, "done", t); }
   renderRuling();
 }
 
@@ -1222,7 +1455,8 @@ function ideaLine(x, extra) {
   return h("div", { class: "line" },
     h("span", { class: "act " + x.action }, x.action),
     h("span", { class: "tick", title: x.isin }, label(x)),
-    x.sizePct != null ? h("span", { class: "num" }, `${x.sizePct.toFixed(1)} pts`) : null, extra);
+    x.sizePct != null ? h("span", { class: "num" }, `${x.sizePct.toFixed(1)} pts`) : x.eur != null ? h("span", { class: "num" }, eur(x.eur)) : null,
+    x.book ? h("span", { class: "chip" }, x.book) : null, extra);
 }
 
 function renderMembers() {
@@ -1237,7 +1471,7 @@ function renderMembers() {
         h("div", {}, h("div", { class: "nm" }, m.name), h("div", { class: "lens" }, m.lens))),
       h("div", { class: "mstate" }, text));
     for (const x of (ideas || [])) {
-      card.append(h("div", { class: "idea" }, ideaLine(x), h("span", { class: "sub" }, `${x.name} · ${x.isin}`),
+      card.append(h("div", { class: "idea" }, ideaLine(x), h("span", { class: "sub" }, x.book ? x.name : `${x.name} · ${x.isin}`),
         h("p", { class: "thesis" }, x.thesis),
         x.evidence.length ? h("ul", { class: "ev" }, x.evidence.map(e => h("li", {}, e))) : null));
     }
@@ -1308,6 +1542,7 @@ function renderRuling() {
   if (s.error) box.append(h("div", { class: "banner bad", role: "status" }, s.error));
   if (s.phase === "cio") { box.append(h("p", { class: "empty" }, "The CIO is reading the minutes. This is the longest step, often a minute or two.")); return; }
   if (s.phase !== "done") return;
+  if (s.bond) return renderBondRuling(box, s);
   const ruling = h("div", { class: "ruling" });
   const c = s.cio;
   ruling.append(h("div", { class: "verdict" },
@@ -1390,7 +1625,7 @@ function renderRing() {
   const cio = $("rn-cio");
   if (cio) cio.setAttribute("class", "r-cio " + (!s ? "" : s.phase === "cio" ? "run" : s.phase === "done" ? "done" : ""));
   const cap = $("ringCaption");
-  if (cap) cap.textContent = !s ? "Committee idle · 9 members + CIO"
+  if (cap) cap.textContent = !s ? `Committee idle · ${MEMBERS.length} members + CIO`
     : { propose: "Proposals in progress", rate: "Peer ratings in progress", cio: "The CIO is ruling", done: "Sitting complete · see the orders below", stopped: "Sitting stopped" }[s.phase] || "";
 }
 
@@ -1440,6 +1675,13 @@ $("copyTpl").addEventListener("click", async () => {
   catch { $("pasteBox").open = true; $("paste").value = text; $("paste").select(); b.textContent = "Template is in the paste box"; }
   setTimeout(() => { b.textContent = "Copy the template"; }, 2500);
 });
+$("bondFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  const st = $("readState");
+  try { loadBond(JSON.parse(await f.text())); st.className = "hint"; st.textContent = "Bond evidence loaded. Convene when ready."; $("conveneBtn").scrollIntoView({ behavior: "smooth", block: "center" }); }
+  catch (err) { st.className = "hint flag"; st.textContent = err instanceof SyntaxError ? "That file isn't JSON. Use the file Bond's Run advice button saves." : err.message; }
+});
 $("conveneBtn").addEventListener("click", convene);
 $("stopBtn").addEventListener("click", () => stopAll("user"));
 $("paste").addEventListener("input", () => { try { localStorage.setItem(KEY + ":paste", $("paste").value); } catch {} });
@@ -1447,7 +1689,7 @@ $("paste").addEventListener("input", () => { try { localStorage.setItem(KEY + ":
 load();
 try { $("paste").value = localStorage.getItem(KEY + ":paste") || ""; if (localStorage.getItem(KEY + ":tab") === "pick") showTab("pick"); } catch {}
 (() => { const t = $("todayLine"); if (t) t.textContent = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); })();
-buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render();
+buildRing(); bindSituation(); renderExampleChip(); renderHoldings(); render(); showBondBanner();
 
 (async () => {
   const banner = $("claudeBanner");
